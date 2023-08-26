@@ -1,0 +1,9 @@
+bentoml
+deepface
+mediapipe
+pandas
+easydict==1.10
+numpy==1.23.5
+tqdm==4.64.1
+Pillow==9.3.0
+tensorboardX==2.5.1

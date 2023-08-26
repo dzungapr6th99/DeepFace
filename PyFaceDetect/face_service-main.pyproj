@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{edd2d495-ab70-4a81-a789-82ae383dcef8}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>service.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="lee_1.jpg" />
+    <Content Include="lee_2.jpg" />
+    <Content Include="port.txt" />
+    <Content Include="requirements.txt" />
+    <Content Include="resources\faces\11925e68-25d1-41d0-9323-44bcd1becb34.jpg" />
+    <Content Include="resources\faces\24085f5c-6fd4-42ad-93de-d2fa932c76c1.jpg" />
+    <Content Include="resources\faces\4c2dd474-1bd2-4d83-853e-493cad50d968.jpg" />
+    <Content Include="resources\faces\52937097-c92a-4d9e-9f07-7df0e1d5a3bb.jpg" />
+    <Content Include="resources\faces\779a7473-d594-4ee9-829c-e88bc05b611d.jpg" />
+    <Content Include="resources\faces\87549c68-b48d-4844-8492-ac659f176ccb.jpg" />
+    <Content Include="resources\faces\947c2a08-1b23-4c53-a032-1bf4e1842159.jpg" />
+    <Content Include="resources\faces\967e4704-50cd-4dbf-9ef6-6e5082a9b522.jpg" />
+    <Content Include="resources\faces\a97304e0-8b48-41ee-af36-315a2a47b872.jpg" />
+    <Content Include="resources\faces\b5b5c634-d9ab-4654-ac53-caac35e4b71f.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="anti_face\anti_spoof_predict.py" />
+    <Compile Include="anti_face\data_io\dataset_folder.py" />
+    <Compile Include="anti_face\data_io\dataset_loader.py" />
+    <Compile Include="anti_face\data_io\functional.py" />
+    <Compile Include="anti_face\data_io\transform.py" />
+    <Compile Include="anti_face\default_config.py" />
+    <Compile Include="anti_face\generate_patches.py" />
+    <Compile Include="anti_face\model_lib\MiniFASNet.py" />
+    <Compile Include="anti_face\model_lib\MultiFTNet.py" />
+    <Compile Include="anti_face\predict.py" />
+    <Compile Include="anti_face\train_main.py" />
+    <Compile Include="anti_face\utility.py" />
+    <Compile Include="clear_db.py" />
+    <Compile Include="create_db.py" />
+    <Compile Include="DeepFace.py" />
+    <Compile Include="download_model.py" />
+    <Compile Include="functions.py" />
+    <Compile Include="resp_code.py" />
+    <Compile Include="service.py" />
+    <Compile Include="test.py" />
+    <Compile Include="test_db.py" />
+    <Compile Include="test_requests.py" />
+    <Compile Include="utils.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="anti_face" />
+    <Folder Include="anti_face\data_io" />
+    <Folder Include="anti_face\model_lib" />
+    <Folder Include="resources\" />
+    <Folder Include="resources\faces" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
