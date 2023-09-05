@@ -11,14 +11,13 @@ namespace MLCpp
 		torch::nn::Sequential ft;
 
 	public:
-		FTGenerator();
 		~FTGenerator();
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="_in_chanels">48</param>
 		/// <param name="out_chanels">1</param>
-		FTGenerator(int _in_chanels, int out_chanels);
+		FTGenerator(int _in_chanels = 48, int out_chanels = 1);
 
 	public:
 		torch::Tensor forward(torch::Tensor input);
