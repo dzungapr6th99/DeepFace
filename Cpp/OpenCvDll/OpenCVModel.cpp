@@ -101,4 +101,15 @@ namespace OpenCVClr
 		return Detect_Eyes;
 
 	}
+
+	void* CreateModel(char* path, char* path_Eyes)
+	{
+		return new OpenCVModel(path, path_Eyes);
+	}
+
+	void DetectImage(void* model, char* base64Image)
+	{
+		OpenCVModel* model1 = (OpenCVModel*)model;
+		
+	}
 }

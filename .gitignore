@@ -200,6 +200,9 @@ ClientBin/
 *.jfm
 *.pfx
 *.publishsettings
+*.onnx
+*.h5
+*.pt
 node_modules/
 orleans.codegen.cs
 

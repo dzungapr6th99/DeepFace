@@ -1,4 +1,4 @@
-# common dependencies
+﻿# common dependencies
 import os
 from os import path
 import warnings
@@ -15,19 +15,17 @@ import tensorflow as tf
 from anti_face.predict import *
 
 # package dependencies
-from deepface.basemodels import (
-    VGGFace,
-    OpenFace,
-    Facenet,
-    #Facenet512,
-    FbDeepFace,
-    DeepID,
-    #DlibWrapper,
-    ArcFace,
-    SFace,
+from deepface.commons import package_utils, folder_utils
+from deepface.commons.logger import Logger
+from deepface.modules import (
+    modeling,
+    representation,
+    verification,
+    recognition,
+    demography,
+    detection,
+    streaming,
 )
-from deepface.extendedmodels import Age, Gender, Race, Emotion
-from deepface.commons import realtime, distance as dst
 import functions
 
 # -----------------------------------

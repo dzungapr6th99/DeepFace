@@ -25,6 +25,11 @@ namespace OpenCVClr
 
 
 	};
+	EXTERN_C
+	{
+		void* CreateModel(char* path, char * path_eyes);
+		void DetectImage(void * model,char* base64Image);
 
+	};
 }
 
