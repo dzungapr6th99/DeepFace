@@ -136,7 +136,7 @@ namespace TcpInterface
             catch(Exception ex) 
             {
                 return null;
-                LOG.LogWriter.Error(ex);
+                LOG.log.Error(ex);
             }
             return null;
 
@@ -164,7 +164,7 @@ namespace TcpInterface
             }
             catch (System.Exception ex)
             {
-                LOG.LogWriter.Error(ex.ToString());
+                LOG.log.Error(ex.ToString());
                 StopConnected();
             }
             return false;
@@ -196,7 +196,7 @@ namespace TcpInterface
             }
             catch (System.Exception ex)
             {
-                LOG.LogWriter.Error("TEST xem ghi log gi:" + ex.ToString());
+                LOG.log.Error("TEST xem ghi log gi:" + ex.ToString());
 
             }
         } 

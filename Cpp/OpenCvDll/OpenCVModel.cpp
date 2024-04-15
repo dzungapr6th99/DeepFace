@@ -1,4 +1,5 @@
 #include "OpenCVModel.h"
+#include "OpenCVModel.h"
 #include<algorithm>
 #include "Common.h"
 namespace OpenCVClr
@@ -32,7 +33,7 @@ namespace OpenCVClr
 		}
 	}
 
-	void OpenCVModel::Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate)
+	void OpenCVModel::Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat> ListFaces)
 	{
 		vector<cv::Mat> Detect_Faces;
 		vector<cv::Rect> Eye_Region;
@@ -51,6 +52,7 @@ namespace OpenCVClr
 			cv::Mat Eye;
 			vector<cv::Rect> detectFaceRect;
 			cv::Mat Face = img(cv::Range(objects[i].y, objects[i].y + objects[i].height), cv::Range(objects[i].x, objects[i].x + objects[i].width)); // Crop Image
+			ListFaces.push_back(Face);
 			if (Align)
 			{
 				vector<cv::Rect> Eye_Align = Align_Face(Face);
@@ -99,6 +101,28 @@ namespace OpenCVClr
 		Detect_Eyes.push_back(Left_Eye);
 		Detect_Eyes.push_back(Right_Eye);
 		return Detect_Eyes;
+
+	}
+
+	void* CreateModel(char* path, char* path_Eyes)
+	{
+		return new OpenCVModel(path, path_Eyes);
+	}
+
+	void DetectImage(void* model, char* base64Image, int length, unsigned char** ListImage)
+	{
+		OpenCVModel* model1 = (OpenCVModel*)model;
+		std::vector<int> EyesCoordinate;
+		std::vector<cv::Mat> Faces;
+		model1->Detect(base64Image, length, false, EyesCoordinate, Faces);
+		ListImage = new unsigned char* [Faces.size()];
+		for (int i = 0; i < Faces.size(); i++)
+		{
+			cv::Mat ResizeFace;
+			cv::resize(Faces[i], ResizeFace, cv::Size(244, 244));
+			*(ListImage + i) = ResizeFace.data;
+
+		}
 
 	}
 }

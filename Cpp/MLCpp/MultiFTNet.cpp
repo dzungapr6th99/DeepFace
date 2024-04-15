@@ -1,27 +1,7 @@
 #include "MultiFTNet.h"
 namespace MLCpp
 {
-    FTGenerator::FTGenerator()
-    {
-        int in_channels = 48;
-        int out_channels = 1;
-        std::vector<int64_t> kernel3 = { 3,3 };
-
-        ft = torch::nn::Sequential(
-            torch::nn::Conv2d(torch::nn::Conv2dOptions(in_channels, 128, kernel3).padding(1)),
-            torch::nn::BatchNorm2d(128),
-            torch::nn::ReLU(true),
-
-            torch::nn::Conv2d(torch::nn::Conv2dOptions(128, 64, kernel3).padding(1)),
-            torch::nn::BatchNorm2d(64),
-            torch::nn::ReLU(true),
-
-            torch::nn::Conv2d(torch::nn::Conv2dOptions(64, out_channels, kernel3).padding(1)),
-            torch::nn::BatchNorm2d(out_channels),
-            torch::nn::ReLU(true)
-        );
-    }
-
+   
 	FTGenerator::FTGenerator(int in_channels = 48, int out_channels =1)
 	{
         std::vector<int64_t> kernel3 = { 3,3 };

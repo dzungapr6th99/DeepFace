@@ -8,6 +8,6 @@ namespace CommonLib
 {
    public class LOG
     {
-        public static readonly NLog.Logger LogWriter = NLog.LogManager.GetCurrentClassLogger();
+        public static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
     }
 }

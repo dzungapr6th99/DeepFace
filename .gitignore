@@ -200,6 +200,9 @@ ClientBin/
 *.jfm
 *.pfx
 *.publishsettings
+*.onnx
+*.h5
+*.pt
 node_modules/
 orleans.codegen.cs
 
@@ -248,6 +251,7 @@ FakesAssemblies/
 **/*.DesktopClient/ModelManifest.xml
 **/*.Server/GeneratedArtifacts
 **/*.Server/ModelManifest.xml
+**/*.onnx
 _Pvt_Extensions
 
 # Paket dependency manager

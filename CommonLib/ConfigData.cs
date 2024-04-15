@@ -26,9 +26,8 @@ namespace CommonLib
         public static string OpenCV_Wrapper_Eye_Path;
         public static void InitConfigData(IConfigurationRoot configurationRoot)
         {
-            SOH = (char)0x01;
-            Cascade_Path = "";
-            
+            Cascade_Path = configurationRoot["OpenCVPath"]?.ToString();
+            OpenCV_Wrapper_Eye_Path = configurationRoot["OpenCV_Wrapper_Eye_Path"]?.ToString();
 
 
         }

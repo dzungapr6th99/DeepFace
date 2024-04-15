@@ -11,11 +11,13 @@
     <OutputPath>.</OutputPath>
     <Name>PyFaceDetect</Name>
     <RootNamespace>PyFaceDetect</RootNamespace>
+    <InterpreterId>CondaEnv|CondaEnv|anaconda</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
+		
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
@@ -77,6 +79,9 @@
     <Content Include="resources\faces\967e4704-50cd-4dbf-9ef6-6e5082a9b522.jpg" />
     <Content Include="resources\faces\a97304e0-8b48-41ee-af36-315a2a47b872.jpg" />
     <Content Include="resources\faces\b5b5c634-d9ab-4654-ac53-caac35e4b71f.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|anaconda" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

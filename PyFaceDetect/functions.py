@@ -10,7 +10,7 @@ import cv2
 import tensorflow as tf
 
 # package dependencies
-from deepface.detectors import FaceDetector
+from deepface.detectors import DetectorWrapper
 
 
 # --------------------------------------------------
@@ -23,7 +23,7 @@ tf_minor_version = int(tf_version.split(".")[1])
 if tf_major_version == 1:
     from keras.preprocessing import image
 elif tf_major_version == 2:
-    from tensorflow.keras.preprocessing import image
+    from keras.preprocessing import image
 
 # --------------------------------------------------
 
@@ -107,8 +107,8 @@ def extract_faces(
     if detector_backend == "skip":
         face_objs = [(img, img_region, 0)]
     else:
-        face_detector = FaceDetector.build_model(detector_backend)
-        face_objs = FaceDetector.detect_faces(face_detector, detector_backend, img, align)
+        face_detector = DetectorWrapper.build_model(detector_backend)
+        face_objs = DetectorWrapper.detect_faces(face_detector, detector_backend, img, align)
 
     # in case of no face found
     if len(face_objs) == 0 and enforce_detection is True:

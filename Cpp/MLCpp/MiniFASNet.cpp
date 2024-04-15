@@ -28,10 +28,10 @@ namespace MLCpp
 	{
 		return flatten(input);
 	}
-	Conv_Block::Conv_Block()
+	/*Conv_Block::Conv_Block()
 	{
 
-	}
+	}*/
 	/// <summary>
 	/// 
 	/// </summary>
@@ -61,10 +61,10 @@ namespace MLCpp
 		return input;
 	}
 
-	Linear_Block::Linear_Block()
+	/*Linear_Block::Linear_Block()
 	{
 
-	}
+	}*/
 	/// <summary>
 	/// 
 	/// </summary>
@@ -90,10 +90,10 @@ namespace MLCpp
 		return input;
 	}
 
-	Depth_Wise::Depth_Wise()
+	/*Depth_Wise::Depth_Wise()
 	{
 
-	}
+	}*/
 	/// <summary>
 	/// hàm Depth_wise
 	/// </summary>
@@ -139,10 +139,10 @@ namespace MLCpp
 		}
 	}
 
-	Residual::Residual()
+	/*Residual::Residual()
 	{
 
-	}
+	}*/
 
 	Residual::Residual(std::vector<std::vector<int>> c1, std::vector<std::vector<int>> c2, std::vector<std::vector<int>> c3, int numblock, int groups, std::vector<int64_t> kernel, std::vector<int64_t> stride, std::vector<int64_t> padding)
 	{
@@ -204,7 +204,7 @@ namespace MLCpp
 		return Model_Input * input;
 	}
 
-	Depth_Wise_SE::Depth_Wise_SE() {}
+	//Depth_Wise_SE::Depth_Wise_SE() {}
 	/// <summary>
 	/// 
 	/// </summary>
@@ -243,10 +243,10 @@ namespace MLCpp
 		return output;
 	}
 
-	ResidualSE::ResidualSE()
+	/*ResidualSE::ResidualSE()
 	{
 
-	}
+	}*/
 
 	ResidualSE::ResidualSE(std::vector<std::vector<int>> c1, std::vector<std::vector<int>> c2, std::vector<std::vector<int>> c3, int num_block, int groups, std::vector<int64_t> kernel, std::vector<int64_t> stride, std::vector<int64_t> padding, int se_reduct = 4)
 	{
@@ -267,7 +267,7 @@ namespace MLCpp
 	}
 	ResidualSE:: ~ResidualSE() {}
 
-	MiniFASNet::MiniFASNet() {}
+	//MiniFASNet::MiniFASNet() {}
 	MiniFASNet::MiniFASNet(std::vector<int> keep, int embedding_size, std::vector<int64_t> conv6_kernel, float drop_p, int num_classess, int img_chanel)
 	{
 		std::vector<int64_t> kernel1({ 1,1 });
@@ -354,10 +354,10 @@ namespace MLCpp
 		return out;
 	}
 
-	MiniFASNetSE::MiniFASNetSE()
+	/*MiniFASNetSE::MiniFASNetSE()
 	{
 
-	}
+	}*/
 
 	MiniFASNetSE::~MiniFASNetSE()
 	{
@@ -393,20 +393,20 @@ namespace MLCpp
 		conv_5 = ResidualSE(c1, c2, c3, 2, keep[40], kernel3, stride1, padding1);
 	}
 
-	MiniFASNetV1::MiniFASNetV1()
+	/*MiniFASNetV1::MiniFASNetV1()
 	{
 
-	}
+	}*/
 
 	MiniFASNetV1::~MiniFASNetV1()
 	{
 
 	}
 
-	MiniFASNetV2::MiniFASNetV2()
+	/*MiniFASNetV2::MiniFASNetV2()
 	{
 
-	}
+	}*/
 
 	MiniFASNetV2::~MiniFASNetV2()
 	{
