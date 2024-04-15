@@ -30,10 +30,13 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestRunModel", "Cpp\TestRunModel\TestRunModel.vcxproj", "{69D6AB61-CFBF-4867-863B-B8BDD8625F47}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCvDll", "Cpp\OpenCvDll\OpenCvDll.vcxproj", "{B8BA86DB-3172-40D9-97D0-5D9BA655C861}"
+<<<<<<< HEAD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTestNET", "UnitTestNET", "{21EE2100-3820-4F2E-8A83-2417D0E994FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWrapper", "TestWrapper\TestWrapper.csproj", "{2052E9AB-A0A7-4EB0-BA7E-EE0C2A28977E}"
+=======
+>>>>>>> d52732b9f3bc244a910e59c5744ae2efbae3bac8
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -207,6 +210,7 @@ Global
 		{B8BA86DB-3172-40D9-97D0-5D9BA655C861}.Release|x64.Build.0 = Release|x64
 		{B8BA86DB-3172-40D9-97D0-5D9BA655C861}.Release|x86.ActiveCfg = Release|Win32
 		{B8BA86DB-3172-40D9-97D0-5D9BA655C861}.Release|x86.Build.0 = Release|Win32
+<<<<<<< HEAD
 		{2052E9AB-A0A7-4EB0-BA7E-EE0C2A28977E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2052E9AB-A0A7-4EB0-BA7E-EE0C2A28977E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2052E9AB-A0A7-4EB0-BA7E-EE0C2A28977E}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -219,6 +223,8 @@ Global
 		{2052E9AB-A0A7-4EB0-BA7E-EE0C2A28977E}.Release|x64.Build.0 = Release|Any CPU
 		{2052E9AB-A0A7-4EB0-BA7E-EE0C2A28977E}.Release|x86.ActiveCfg = Release|Any CPU
 		{2052E9AB-A0A7-4EB0-BA7E-EE0C2A28977E}.Release|x86.Build.0 = Release|Any CPU
+=======
+>>>>>>> d52732b9f3bc244a910e59c5744ae2efbae3bac8
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

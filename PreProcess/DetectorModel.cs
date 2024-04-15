@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using CommonLib;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -70,5 +71,28 @@ namespace PreProcess
         {
             
         }
+=======
+﻿using Microsoft.ML.OnnxRuntime;
+using CommonLib;
+using Tensorflow;
+using System.Numerics.Tensors;
+using System.Numerics;
+using Tensorflow.Keras.Engine;
+
+namespace PreProcess
+{
+    public class DetectorModel
+    {
+        public DetectorModel(string path)
+        {
+
+        }
+
+        public void Detect(string Base64Image1, string Base64Image2)
+        {
+            
+        }
+
+>>>>>>> d52732b9f3bc244a910e59c5744ae2efbae3bac8
     }
 }

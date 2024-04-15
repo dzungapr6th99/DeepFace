@@ -16,11 +16,14 @@
   </ItemGroup>
 
   <ItemGroup>
+<<<<<<< HEAD
     <ProjectReference Include="..\FaceDetectInterface\FaceDetectInterface.csproj" />
     <ProjectReference Include="..\PreProcess\PreProcess.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+=======
+>>>>>>> d52732b9f3bc244a910e59c5744ae2efbae3bac8
     <None Update="appseting.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
