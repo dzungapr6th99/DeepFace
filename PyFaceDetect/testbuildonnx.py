@@ -16,11 +16,7 @@ from keras.layers import (
     )
 
 
-<<<<<<< HEAD
 model2 = VGGFace.load_model()
-=======
-model2 = Facenet.load_facenet128d_model()
->>>>>>> d52732b9f3bc244a910e59c5744ae2efbae3bac8
 print(model2.input_shape)
 print(model2.input)
 # input_signature = [tf.TensorSpec(model2.input_shape, tf.float32, name ='x')]
