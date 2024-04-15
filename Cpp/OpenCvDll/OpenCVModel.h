@@ -3,6 +3,7 @@
 #include<opencv2/opencv.hpp>
 #include"pch.h"
 using namespace std;
+#define CPPEXPORT __declspec(dllexport) 
 namespace OpenCVClr
 {
 	using namespace cv;
@@ -18,18 +19,18 @@ namespace OpenCVClr
 		/// <param name="path"></param>
 		/// <param name="type"></param>
 		OpenCVModel(char* Path, char* Path_Eyes);
-
-		void Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat> ListFaces);
+		void Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat> &ListFaces);
 		cv::Rect* a;
 		vector<cv::Rect> Align_Face(cv::Mat Face);
-
-
-	};
-	EXTERN_C
-	{
-		void* CreateModel(char* path, char* path_eyes);
-		void DetectImage(void* model, char* base64Image, int length, unsigned char** ListFaces);
+		std::string base64_decode(char* base64StringPointer);
 
 	};
+	
 }
+EXTERN_C
+{
+	CPPEXPORT void* CreateModel(char* path, char* path_eyes);
+	CPPEXPORT int DetectImage(void* model, char* base64Image, int length, int width, int height, void*& Data);
+
+};
 

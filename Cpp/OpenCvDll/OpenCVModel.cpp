@@ -33,13 +33,13 @@ namespace OpenCVClr
 		}
 	}
 
-	void OpenCVModel::Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat> ListFaces)
+	void OpenCVModel::Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat>& ListFaces)
 	{
 		vector<cv::Mat> Detect_Faces;
 		vector<cv::Rect> Eye_Region;
 		cv::Mat img;
-
-		vector<uchar> base64data(Base64Array + 0, Base64Array + Length);
+		std::string base64DecodeImg = base64_decode(Base64Array);
+		vector<uchar> base64data(base64DecodeImg.begin(), base64DecodeImg.end());
 		img = cv::imdecode(base64data, IMREAD_COLOR);
 
 		vector<cv::Rect> objects;
@@ -103,26 +103,96 @@ namespace OpenCVClr
 		return Detect_Eyes;
 
 	}
-
-	void* CreateModel(char* path, char* path_Eyes)
+	static inline bool is_base64(unsigned char c)
 	{
-		return new OpenCVModel(path, path_Eyes);
+		return (isalnum(c) || (c == '+') || (c == '/'));
 	}
-
-	void DetectImage(void* model, char* base64Image, int length, unsigned char** ListImage)
+	static const std::string base64_chars =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		"abcdefghijklmnopqrstuvwxyz"
+		"0123456789+/";
+	std::string OpenCVModel::base64_decode(char* base64StringPointer)
 	{
-		OpenCVModel* model1 = (OpenCVModel*)model;
-		std::vector<int> EyesCoordinate;
-		std::vector<cv::Mat> Faces;
-		model1->Detect(base64Image, length, false, EyesCoordinate, Faces);
-		ListImage = new unsigned char* [Faces.size()];
-		for (int i = 0; i < Faces.size(); i++)
-		{
-			cv::Mat ResizeFace;
-			cv::resize(Faces[i], ResizeFace, cv::Size(244, 244));
-			*(ListImage + i) = ResizeFace.data;
+		std::string const& encoded_string = base64StringPointer;
+		int in_len = encoded_string.size();
+		int i = 0;
+		int j = 0;
+		int in_ = 0;
+		unsigned char char_array_4[4], char_array_3[3];
+		std::string ret;
 
+		while (in_len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+		{
+			char_array_4[i++] = encoded_string[in_]; in_++;
+
+			if (i == 4)
+			{
+				for (i = 0; i < 4; i++)
+				{
+					char_array_4[i] = base64_chars.find(char_array_4[i]);
+				}
+
+				char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+				char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+				char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+				for (i = 0; (i < 3); i++)
+				{
+					ret += char_array_3[i];
+				}
+
+				i = 0;
+			}
 		}
 
+		if (i)
+		{
+			for (j = i; j < 4; j++)
+			{
+				char_array_4[j] = 0;
+			}
+
+			for (j = 0; j < 4; j++)
+			{
+				char_array_4[j] = base64_chars.find(char_array_4[j]);
+			}
+
+			char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+			char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+			char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+			for (j = 0; (j < i - 1); j++)
+			{
+				ret += char_array_3[j];
+			}
+		}
+
+		return ret;
 	}
+}
+void* CreateModel(char* path, char* path_Eyes)
+{
+	return new OpenCVClr::OpenCVModel(path, path_Eyes);
+}
+
+int DetectImage(void* model, char* base64Image, int length, int width, int height, void*& ListImage)
+{
+	OpenCVClr::OpenCVModel* model1 = (OpenCVClr::OpenCVModel*)model;
+	std::vector<int> EyesCoordinate;
+	std::vector<cv::Mat>Faces = { };
+	model1->Detect(base64Image, length, false, EyesCoordinate, Faces);
+	/*if (Faces.size() == 0)
+		return 0;*/
+	ListImage = new unsigned char[Faces.size() * 244 * 244 * 3];
+	int index = 0;
+	for (int i = 0; i < Faces.size(); i++)
+	{
+		cv::Mat ResizeFace;
+		cv::resize(Faces[i], ResizeFace, cv::Size(width, height));
+
+		_memccpy(ListImage, Faces[i].data, i, width * height * 3);
+		i += width * height * 3;
+
+	}
+	return Faces.size();
 }

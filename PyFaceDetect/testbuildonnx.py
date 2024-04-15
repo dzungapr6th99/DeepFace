@@ -5,6 +5,7 @@ import onnx
 import os
 import tensorflow as tf
 from deepface.commons import package_utils, folder_utils
+import onnxruntime as ort
 from keras.models import Model, Sequential
 from keras.layers import (
         Convolution2D,
@@ -15,6 +16,7 @@ from keras.layers import (
         Activation,
     )
 
+gpuSessionOption = ort.SessionOptions.MakeSessionOptionWithCudaProvider(0)
 
 model2 = VGGFace.load_model()
 print(model2.input_shape)

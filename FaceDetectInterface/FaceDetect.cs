@@ -42,12 +42,11 @@ namespace FaceDetectInterface
                 NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputInference)
             };
             var ouputReference = c_InferenceSession.Run(inputs);
-            Console.WriteLine("Dimension {0} | {1}",ouputReference[0].AsTensor<float>().Dimensions[0], ouputReference[0].AsTensor<float>().Dimensions[1]);
+            //Console.WriteLine("Dimension {0} | {1}",ouputReference[0].AsTensor<float>().Dimensions[0], ouputReference[0].AsTensor<float>().Dimensions[1]);
             //float[] floatOutPut = ouputReference[0].AsTensor<float>().ToArray();
             List<float[]> outPutDir = TensorToListOfArrays(ouputReference[0].AsTensor<float>());
             return Distance.FindCosineDistance(outPutDir[0], outPutDir[1]) > 0.069;
-            return true;
-
+           
         }
 
         private Tensor<float> ByteArray2Tensor(int numFace, byte[] data, int width, int height)

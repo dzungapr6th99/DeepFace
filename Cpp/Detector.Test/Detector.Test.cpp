@@ -15,8 +15,6 @@ namespace DetectorTest
 	{
 	public:
 
-
-
 		TEST_METHOD(TestDetectImage)
 		{
 			OpenCVClr::OpenCVModel* model = (OpenCVClr::OpenCVModel*)CreateModel("C:\\Users\\Admin\\AI\\.opencv\\opencv\\build\\etc\\haarcascades\\haarcascade_frontalface_default.xml", "C:\\Users\\Admin\\AI\\.opencv\\opencv\\build\\etc\\haarcascades\\haarcascade_eye.xml");

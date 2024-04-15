@@ -14,10 +14,10 @@ namespace PreProcess
     {
         
         public static IntPtr DetectModel;
-        [DllImport("DetectorDLL.dll")]
-        public static extern IntPtr CreateModel(sbyte * path, sbyte* pathEyes);
-        [DllImport("DetectorDLL.dll")]
-        public static extern int DetectImage(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr ListFaceData);
+        [DllImport("DetectorDll.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr CreateModel(sbyte * path, sbyte* pathEyes);
+        [DllImport("DetectorDll.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int DetectImage(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr ListFaceData);
 
         private GCHandle pinedGCHandle;
         public DetectorModel(string path, string PathEyes)
@@ -63,6 +63,7 @@ namespace PreProcess
             GCHandle pinedGCHandle = GCHandle.Alloc(dataPointer, GCHandleType.Pinned);
             Span<byte> byteSpan = new Span<byte>(dataPointer.ToPointer(), NumFaces * 224 * 224 * 3);
             byte[] returnData = byteSpan.ToArray();
+            pinedGCHandle.Free();
             return returnData;
         }
 
