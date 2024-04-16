@@ -16,6 +16,7 @@ và clone code trên git về: https://github.com/tensorflow/tensorflow.git
 OnnxRuntime: Do Microsoft phát triển nên chỉ cần nuget về
 Nếu chạy trên gpu thì làm theo bước bên dưới
 Setup Cuda Toolkit và CuDnn để chạy trên gpu.
+Nếu Visual studio Nsight nó có recommend thì cài  nó luôn
 Làm theo hướng dẫn trên trang https://onnxruntime.ai/docs/tutorials/csharp/csharp-gpu.html
 
 
@@ -28,6 +29,4 @@ https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
 
 Build thư viện wrapper OpenCV:
 build project DetectorDll ra dll và cop vào project PreProcess là có thể run được(lưu ý setup lại đường dẫn opencv cho project DetectorDll)
-
-
 
