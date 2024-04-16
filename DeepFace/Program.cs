@@ -1,5 +1,6 @@
 using CommonLib;
 using DeepFace;
+
 using Microsoft.Extensions.Configuration;
 using System.Runtime.InteropServices;
 using Microsoft.OpenApi.Models;
@@ -12,7 +13,6 @@ IConfiguration configuration = null; //so it can be used on other configuration 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     Args = args,
-
     WebRootPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "wwwroot")), //point where if serving static files from default location. Works for my case. May need some adjustments in other cases.
 });
 
@@ -29,13 +29,15 @@ builder.Host.UseNLog();
 // Init configs
 ConfigData.InitConfigData(builder.Configuration);
 Starting.InitProject(builder.Services);
-builder.Services.AddEndpointsApiExplorer(); builder.Services.AddSwaggerGen(c =>
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllersWithViews();
+builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "JWTToken_Auth_API",
         Version = "v1"
-    });
+    }); 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "TOKEN",
@@ -61,16 +63,15 @@ builder.Services.AddEndpointsApiExplorer(); builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseCors("AllowAllCors");
+app.UseStaticFiles();
 app.UseRouting();
+app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 app.Run();

@@ -22,6 +22,12 @@
     <None Update="ModelAI\haarcascade_eye.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="ModelAI\haarcascade_frontalface_default.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ModelAI\VGGFace.onnx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="opencv_world470.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
