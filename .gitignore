@@ -73,7 +73,7 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
-
+*.dll
 # Chutzpah Test files
 _Chutzpah*
 
@@ -252,6 +252,7 @@ FakesAssemblies/
 **/*.Server/GeneratedArtifacts
 **/*.Server/ModelManifest.xml
 **/*.onnx
+**/*.dll
 _Pvt_Extensions
 
 # Paket dependency manager

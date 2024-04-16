@@ -22,14 +22,22 @@ namespace CommonLib
         public static string Cascade_Path; 
         public static List<string> ListPreModel = new List<string>();
         public static Dictionary<string, string> ListPreModelPath = new Dictionary<string, string>();
-        public static string OpenCV_Wrapper_Path;
-        public static string OpenCV_Wrapper_Eye_Path;
+        public static string ModelDetector_Face_Path;
+        public static string ModelDetector_Eye_Path;
+        public static string ModelVerifyPath;
+        public static string ModelPath;
+        public static bool IsRunOnGpu = false;
+        public static Dictionary<string, Dictionary<string, float>> DictThreshold;
         public static void InitConfigData(IConfigurationRoot configurationRoot)
         {
-            Cascade_Path = configurationRoot["OpenCVPath"]?.ToString();
-            OpenCV_Wrapper_Eye_Path = configurationRoot["OpenCV_Wrapper_Eye_Path"]?.ToString();
-
-
+            LOG.log.Info("Start init");
+            ModelPath = configurationRoot["ModelPath"]?.ToString();
+            ModelDetector_Face_Path = Path.Combine(ModelPath, configurationRoot["ModelFaceDetector"]?.ToString());
+            ModelDetector_Eye_Path = Path.Combine(ModelPath, configurationRoot["ModelEyesDetector"]?.ToString());
+            ModelVerifyPath = Path.Combine(ModelPath, configurationRoot["ModelVerifyFace"]?.ToString());
+            DictThreshold = configurationRoot.GetSection("Threshold").Get<Dictionary<string, Dictionary<string, float>>>();
+            IsRunOnGpu = configurationRoot["UseGpu"]?.ToString() == "true";
+            LOG.log.Info("Init configuration success");
         }
     }
 }

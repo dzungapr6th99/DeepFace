@@ -20,7 +20,7 @@ namespace TestWrapper
         public void TestCreateModel()
         {
             string PathModel = ConfigData.Cascade_Path;
-            detectorModel = new DetectorModel( PathModel, ConfigData.OpenCV_Wrapper_Eye_Path);
+            detectorModel = new DetectorModel();
             Assert.IsTrue(true);
         }
 
@@ -30,8 +30,8 @@ namespace TestWrapper
         {
             if (detectorModel == null)
             {
-                detectorModel = new DetectorModel(ConfigData.Cascade_Path, ConfigData.OpenCV_Wrapper_Eye_Path);
-
+                detectorModel = new DetectorModel();
+                detectorModel.LoadModel();
             }
             (int faces, byte[] facesArraydata) = detectorModel.Detect(ImgBase64Input, 224,224);
             
@@ -43,10 +43,11 @@ namespace TestWrapper
         {
             if (detectorModel == null)
             {
-                detectorModel = new DetectorModel(ConfigData.Cascade_Path, ConfigData.OpenCV_Wrapper_Eye_Path);
-
+                detectorModel = new DetectorModel();
+                detectorModel.LoadModel();
             }
-            FaceDetect faceDetect = new(detectorModel, "VGGFace.onnx", 224, 224);
+            FaceDetect faceDetect = new(detectorModel);
+            faceDetect.LoadModel();
             faceDetect.Verify(ImgBase64Db, ImgBase64Input);
         }
 

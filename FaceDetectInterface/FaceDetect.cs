@@ -8,22 +8,50 @@ using System.Numerics.Tensors;
 using PreProcess;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using System.Runtime.InteropServices;
+using System;
 namespace FaceDetectInterface
 {
+    public interface IFaceDetect
+    {
+        public bool Verify(string ImgBase64Db, string ImgBase64Input);
+        public void LoadModel();
+    }
 
-    public class FaceDetect
+    public class FaceDetect : IFaceDetect
     {
         private IDetectorModel c_DetectorModel;
         private int width;
         private int height;
         private InferenceSession c_InferenceSession;
-        public FaceDetect(IDetectorModel p_DetectorModel, string _Path, int _width, int _height)
+        private string PathModel;
+        private bool IsloadModel = false;
+        private bool IsLoadModel = false;
+        public FaceDetect(IDetectorModel p_DetectorModel)
         {
             c_DetectorModel = p_DetectorModel;
-            SessionOptions gpuSessionOption = SessionOptions.MakeSessionOptionWithCudaProvider(0);
-            c_InferenceSession = new InferenceSession(_Path, gpuSessionOption);
-            width = _width;
-            height = _height;
+            PathModel = ConfigData.ModelVerifyPath;
+            
+            IsLoadModel = false;
+          
+        }
+
+        public void LoadModel()
+        {
+            width = 224;
+            height = 224;
+            if (!IsLoadModel)
+            {
+                if (ConfigData.IsRunOnGpu)
+                {
+                    SessionOptions gpuSessionOption = SessionOptions.MakeSessionOptionWithCudaProvider(0);
+                    c_InferenceSession = new InferenceSession(PathModel, gpuSessionOption);
+                }
+                else
+                {
+                    c_InferenceSession = new InferenceSession(PathModel);
+                }
+            }
+            IsLoadModel = true; 
         }
 
         public bool Verify(string ImgBase64Db, string ImgBase64Input)
@@ -36,7 +64,7 @@ namespace FaceDetectInterface
             FacesData.Add(DataDb);
             FacesData.Add(DataInput);
             Tensor<float> InputInference = ByteArraysToTensor(FacesData, width, height);
-            
+
             var inputs = new List<NamedOnnxValue>
             {
                 NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputInference)
@@ -46,7 +74,7 @@ namespace FaceDetectInterface
             //float[] floatOutPut = ouputReference[0].AsTensor<float>().ToArray();
             List<float[]> outPutDir = TensorToListOfArrays(ouputReference[0].AsTensor<float>());
             return Distance.FindCosineDistance(outPutDir[0], outPutDir[1]) > 0.069;
-           
+
         }
 
         private Tensor<float> ByteArray2Tensor(int numFace, byte[] data, int width, int height)

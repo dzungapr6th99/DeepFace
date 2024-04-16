@@ -7,10 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ModelAI\" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ApiServer\ApiServer.csproj" />
+    <ProjectReference Include="..\CommonLib\CommonLib.csproj" />
+    <ProjectReference Include="..\DetectFaceObject\DetectFaceObject.csproj" />
+    <ProjectReference Include="..\FaceDetectInterface\FaceDetectInterface.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ModelAI\haarcascade_eye.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="opencv_world470.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="opencv_world470d.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="VGGFace.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
