@@ -50,6 +50,7 @@ namespace PreProcess
                 sbyte* PathEyesPointer = (sbyte*)GCHandle.Alloc(c_PathEyes.ToCharArray(), GCHandleType.Pinned).AddrOfPinnedObject().ToPointer();
                 DetectModel = CreateModel(_BufferPath, _BufferEye);
                 LOG.log.Info("Create Detect model success");
+                IsloadedModel = true;
             }
         }
         public (int, byte[]) Detect(string Base64Image, int width, int height)
@@ -74,7 +75,7 @@ namespace PreProcess
         {
 
             GCHandle pinedGCHandle = GCHandle.Alloc(dataPointer, GCHandleType.Pinned);
-            Span<byte> byteSpan = new Span<byte>(dataPointer.ToPointer(), NumFaces * 224 * 224 * 3);
+            Span<byte> byteSpan = new Span<byte>(dataPointer.ToPointer(), NumFaces * width * height * 3);
             byte[] returnData = byteSpan.ToArray();
             pinedGCHandle.Free();
             return returnData;
