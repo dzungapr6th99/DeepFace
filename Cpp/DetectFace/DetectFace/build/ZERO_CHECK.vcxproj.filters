@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\DzungApr6th_git\DetectFace\DetectFace\build\CMakeFiles\7de55f0412dc2735a2afe61e373fc788\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{DC6BABC9-4C34-3B5B-B757-60DB1494D5FA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

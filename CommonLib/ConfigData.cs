@@ -28,12 +28,14 @@ namespace CommonLib
         public static string ModelPath;
         public static bool IsRunOnGpu = false;
         public static Dictionary<string, Dictionary<string, float>> DictThreshold;
+        public static string MtCnnPath;
         public static void InitConfigData(IConfigurationRoot configurationRoot)
         {
             LOG.log.Info("Start init");
             ModelPath = configurationRoot["ModelPath"]?.ToString();
             ModelDetector_Face_Path = Path.Combine(ModelPath, configurationRoot["ModelFaceDetector"]?.ToString());
             ModelDetector_Eye_Path = Path.Combine(ModelPath, configurationRoot["ModelEyesDetector"]?.ToString());
+            MtCnnPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + configurationRoot["MtCnnPath"]?.ToString() + Path.DirectorySeparatorChar;
             ModelVerifyPath = Path.Combine(ModelPath, configurationRoot["ModelVerifyFace"]?.ToString());
             DictThreshold = configurationRoot.GetSection("Threshold").Get<Dictionary<string, Dictionary<string, float>>>();
             IsRunOnGpu = configurationRoot["UseGpu"]?.ToString() == "true";

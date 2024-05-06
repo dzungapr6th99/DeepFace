@@ -6,7 +6,7 @@ There are serveral method to unit test for DLLs project. but I need to check the
 #include "pch.h"
 #include "CppUnitTest.h"
 #include "OpenCVModel.h"
-
+#include "detector.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace DetectorTest
@@ -31,5 +31,13 @@ namespace DetectorTest
 			} 
 			
 		}
+
+		TEST_METHOD(TestCreateMtCnnModel)
+		{
+			CreateMTCnnModel();
+			Assert::IsTrue(true);
+		}
 	};
+
+	
 }

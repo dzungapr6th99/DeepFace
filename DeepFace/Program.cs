@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
 string ConfigFolder = "./ConfigApp"; //can be relative or fullpath
-string ConfigLogFile = "ConfigLog/nlog.config";
+string ConfigLogFile = "./ConfigLog/nlog.config";
 var logger = NLogBuilder.ConfigureNLog(ConfigLogFile).GetCurrentClassLogger();
 
 IConfiguration configuration = null; //so it can be used on other configuration functions bellow
