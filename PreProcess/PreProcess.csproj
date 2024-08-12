@@ -24,7 +24,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <PropertyGroup>
+  <!--<PropertyGroup>
     <DefineConstants>UNIX</DefineConstants>
-  </PropertyGroup>
+  </PropertyGroup>-->
 </Project>

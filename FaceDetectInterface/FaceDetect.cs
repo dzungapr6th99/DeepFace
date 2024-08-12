@@ -15,6 +15,7 @@ namespace FaceDetectInterface
     {
         public bool Verify(string ImgBase64Db, string ImgBase64Input);
         public void LoadModel();
+        bool Detect(string ImgBase64);
     }
 
     public class FaceDetect : IFaceDetect
@@ -62,36 +63,66 @@ namespace FaceDetectInterface
             IsLoadModel = true;
         }
 
+        public bool Detect(string ImgBase64)
+        {
+            try
+            {
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64, width, height);
+                if (numFaceDb >= 0)
+                    return true;
+                else
+                    return false;
+
+            }
+            catch(Exception ex)
+            {
+                LOG.log.Error(ex);
+                return false;
+            }
+
+        }
+
         public bool Verify(string ImgBase64Db, string ImgBase64Input)
         {
-            (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64Db, width, height);
-            LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
-            (int numFaceInput, byte[] DataInput) = c_DetectorModel.Detect(ImgBase64Input, width, height);
-            LOG.log.Info("ImgBaseInpit detected {0} faces", numFaceInput);
-            List<byte[]> FacesData = new List<byte[]>();
-            FacesData.Add(DataDb.AsSpan().Slice(0 , width * height * 3).ToArray());
-            FacesData.Add(DataInput.AsSpan().Slice(0, width * height * 3).ToArray());
-            for (int i = 0; i < numFaceDb; i++)
+            try
             {
-                FacesData.Add(DataDb.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
-            }
-            for (int i = 0; i < numFaceInput; i++)
-            {
-                FacesData.Add(DataInput.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
-            }
-            Tensor<float> InputInference = ByteArraysToTensor(FacesData, width, height);
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64Db, width, height);
+                LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
+                (int numFaceInput, byte[] DataInput) = c_DetectorModel.Detect(ImgBase64Input, width, height);
+                LOG.log.Info("ImgBaseInpit detected {0} faces", numFaceInput);
+                List<byte[]> FacesData = new List<byte[]>();
+                for (int i = 0; i < numFaceDb; i++)
+                {
+                    FacesData.Add(DataDb.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
+                }
+                for (int i = 0; i < numFaceInput; i++)
+                {
+                    FacesData.Add(DataInput.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
+                }
+                Tensor<float> InputInference = ByteArraysToTensor(FacesData, width, height);
 
-            var inputs = new List<NamedOnnxValue>
+                var inputs = new List<NamedOnnxValue>
+                {
+                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputInference)
+                };
+                var ouputReference = c_InferenceSession.Run(inputs);
+                //Console.WriteLine("Dimension {0} | {1}",ouputReference[0].AsTensor<float>().Dimensions[0], ouputReference[0].AsTensor<float>().Dimensions[1]);
+                //float[] floatOutPut = ouputReference[0].AsTensor<float>().ToArray();
+                List<float[]> outPutDir = TensorToListOfArrays(ouputReference[0].AsTensor<float>());
+                double distance = Distance.FindCosineDistance(outPutDir[0], outPutDir[1]);
+                LOG.log.Info("Distance: {0}", distance);
+                return distance > ConfigData.Threshold;
+
+            }
+            catch (Exception ex)
             {
-                NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputInference)
-            };
-            var ouputReference = c_InferenceSession.Run(inputs);
-            //Console.WriteLine("Dimension {0} | {1}",ouputReference[0].AsTensor<float>().Dimensions[0], ouputReference[0].AsTensor<float>().Dimensions[1]);
-            //float[] floatOutPut = ouputReference[0].AsTensor<float>().ToArray();
-            List<float[]> outPutDir = TensorToListOfArrays(ouputReference[0].AsTensor<float>());
-            double distance = Distance.FindCosineDistance(outPutDir[0], outPutDir[1]);
-            LOG.log.Info("Distance: {0}", distance);
-            return distance > 0.069;
+                LOG.log.Info(ex);
+                throw;
+            }
+            catch
+            {
+                throw;
+            }
 
         }
 

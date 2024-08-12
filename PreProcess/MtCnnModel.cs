@@ -52,20 +52,34 @@ namespace PreProcess
         }
         public (int, byte[]) Detect(string Base64Image, int width, int height)
         {
-            IntPtr ListFaceData;
-            byte[] base64ImgRaw = Encoding.UTF8.GetBytes(Base64Image);
-            sbyte* dataImg = (sbyte*)GCHandle.Alloc(base64ImgRaw, GCHandleType.Pinned).AddrOfPinnedObject().ToPointer();
-            Marshal.Copy(base64ImgRaw, 0, (IntPtr)(dataImg + 0), Base64Image.Length);
+            try
+            {
 
-            int NumFaces = DetectFace(DetectModel, dataImg, Base64Image.Length, width, height, out ListFaceData);
-            if (NumFaces > 0)
-            {
-                //Tức là detect ra có.     
-                return (NumFaces, GetImgDataArray(NumFaces, width, height, ListFaceData));
+                IntPtr ListFaceData;
+                byte[] base64ImgRaw = Encoding.UTF8.GetBytes(Base64Image);
+                sbyte* dataImg = (sbyte*)GCHandle.Alloc(base64ImgRaw, GCHandleType.Pinned).AddrOfPinnedObject().ToPointer();
+                Marshal.Copy(base64ImgRaw, 0, (IntPtr)(dataImg + 0), Base64Image.Length);
+
+                int NumFaces = DetectFace(DetectModel, dataImg, Base64Image.Length, width, height, out ListFaceData);
+                if (NumFaces > 0)
+                {
+                    //Tức là detect ra có.     
+                    return (NumFaces, GetImgDataArray(NumFaces, width, height, ListFaceData));
+                }
+                else
+                {
+                    return (0, null);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return (0, null);
+                LOG.log.Error(ex);
+                throw;
+            }
+            catch
+            {
+                throw;
+                
             }
         }
         public byte[] GetImgDataArray(int NumFaces, int width, int height, IntPtr dataPointer)

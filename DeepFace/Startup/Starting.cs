@@ -13,10 +13,10 @@ namespace DeepFace
     {
         public static void InitProject(IServiceCollection services)
         {
-            services.AddSingleton<IDetectorModel, MtCnnModel>();
+            services.AddSingleton<IDetectorModel, DetectorModel>();
             services.AddSingleton<IFaceDetect, FaceDetect>();
             services.AddSingleton<IProcessDetectFaceRequest, ProcessDetectFaceRequest>();
-            services.AddSingleton<IValidator<DetectFaceRequest>,Api1DetectFaceValidation>();  
+            services.AddSingleton<IValidator<VerifyFaceRequest>,Api1DetectFaceValidation>();  
             services.AddHostedService<Workers>();  
         }
     }

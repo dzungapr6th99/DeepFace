@@ -16,6 +16,26 @@ using System.Runtime.CompilerServices;
 
 namespace CommonLib
 {
+    public class DetectInfo
+    {
+        public double cosine { get; set; }
+        public double euclidean { get; set; }
+        public double euclidean_l2 { get; set; }
+    }
+
+    public class Threshold
+    {
+        public DetectInfo VGGFace { get; set; }
+        public DetectInfo Facenet { get; set; }
+        public DetectInfo Facenet512 { get; set; }
+        public DetectInfo ArcFace { get; set; }
+        public DetectInfo Dlib { get; set; }
+        public DetectInfo SFace { get; set; }
+        public DetectInfo OpenFace { get; set; }
+        public DetectInfo DeepFace { get; set; }
+        public DetectInfo DeepID { get; set; }
+        
+    }
     public class ConfigData
     {
         public static char SOH;
@@ -29,6 +49,7 @@ namespace CommonLib
         public static bool IsRunOnGpu = false;
         public static Dictionary<string, Dictionary<string, float>> DictThreshold;
         public static string MtCnnPath;
+        public static double Threshold;
         public static void InitConfigData(IConfigurationRoot configurationRoot)
         {
             LOG.log.Info("Start init");
@@ -40,6 +61,7 @@ namespace CommonLib
             DictThreshold = configurationRoot.GetSection("Threshold").Get<Dictionary<string, Dictionary<string, float>>>();
             IsRunOnGpu = configurationRoot["UseGpu"]?.ToString() == "true";
             LOG.log.Info("Init configuration success");
+            Threshold = double.Parse(configurationRoot["Threshold:VGGFace:cosine"]);
         }
     }
 }
