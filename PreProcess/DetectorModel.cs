@@ -22,9 +22,9 @@ namespace PreProcess
         private bool IsloadedModel = false;
         public static IntPtr DetectModel;
 #if !UNIX
-        [DllImport("DetectorDll.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("DetectorDll.dll"/*, CallingConvention = CallingConvention.Winapi*/)]
         private static extern IntPtr CreateModel(sbyte* path, sbyte* pathEyes);
-        [DllImport("DetectorDll.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("DetectorDll.dll"/*, CallingConvention = CallingConvention.Winapi*/)]
         private static extern int DetectImage(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr ListFaceData);
 #else
         [DllImport("libDetectFace.so", CallingConvention = CallingConvention.Cdecl)]

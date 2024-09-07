@@ -99,17 +99,23 @@ namespace FaceDetectInterface
                 {
                     FacesData.Add(DataInput.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
                 }
-                Tensor<float> InputInference = ByteArraysToTensor(FacesData, width, height);
+                Tensor<float> InputCheck = ByteArray2Tensor(1 ,FacesData[0], width, height);
+                Tensor<float> InputVerify = ByteArray2Tensor(1 ,FacesData[1], width, height);
 
-                var inputs = new List<NamedOnnxValue>
+                var inputs_Check = new List<NamedOnnxValue>
                 {
-                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputInference)
+                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputCheck)
                 };
-                var ouputReference = c_InferenceSession.Run(inputs);
-                //Console.WriteLine("Dimension {0} | {1}",ouputReference[0].AsTensor<float>().Dimensions[0], ouputReference[0].AsTensor<float>().Dimensions[1]);
-                //float[] floatOutPut = ouputReference[0].AsTensor<float>().ToArray();
-                List<float[]> outPutDir = TensorToListOfArrays(ouputReference[0].AsTensor<float>());
-                double distance = Distance.FindCosineDistance(outPutDir[0], outPutDir[1]);
+                var ouputCheck = c_InferenceSession.Run(inputs_Check);
+
+                var inputs_Verify = new List<NamedOnnxValue>
+                {
+                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputVerify)
+                };
+                var ouputVerify = c_InferenceSession.Run(inputs_Verify);
+                float[] outPutCheck = TensorToFloatArray(ouputCheck[0].AsTensor<float>());
+                float[] outPutVerify = TensorToFloatArray(ouputVerify[0].AsTensor<float>());
+                double distance = Distance.FindCosineDistance(outPutCheck, outPutVerify);
                 LOG.log.Info("Distance: {0}", distance);
                 return distance > ConfigData.Threshold;
 

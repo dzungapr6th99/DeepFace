@@ -20,6 +20,9 @@
     <None Update="DetectorDll.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="DetectorDll.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="MtCnnDll.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

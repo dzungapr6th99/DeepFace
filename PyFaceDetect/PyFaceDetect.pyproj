@@ -17,7 +17,6 @@
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
-		
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
@@ -38,6 +37,7 @@
     <Compile Include="DeepFace.py" />
     <Compile Include="functions.py" />
     <Compile Include="PyFaceDetect.py" />
+    <Compile Include="testbuildonnx.py" />
     <Compile Include="utils.py" />
   </ItemGroup>
   <ItemGroup>

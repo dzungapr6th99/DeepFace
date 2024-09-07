@@ -23,18 +23,20 @@ from deepface.detectors.Yolo import Any, YoloClient
 from deepface.detectors.MtCnn import MTCNN, MtCnnClient
 #gpuSessionOption = ort.SessionOptions.MakeSessionOptionWithCudaProvider(0)
 
-#model2 = VGGFace.load_model()
-#print(model2.input_shape)
+model2 = VGGFace.load_model();
+print(model2.input_shape)
 #print(model2.input)
-model3 = YoloClient()
-model3.build_model()
-# input_signature = [tf.TensorSpec(model2.input_shape, tf.float32, name ='x')]
-#onnx_model, onnx_output = tf2onnx.convert.from_keras(model2)
-torch_input = torch.randn()
-onnxProgram = torch.onnx.export(model= model3,  args = torch_input,f="YoloV8.onnx", verbose=True)
-onnxProgram.save("YoloV8.onnx")
-image_2 = cv2.imread("lee_2.jpg")
+#model3 = YoloClient()
+#model3.build_model()
+input_signature = [tf.TensorSpec(model2.input_shape, tf.float32, name ='x')]
+onnx_model, onnx_output = tf2onnx.convert.from_keras(model2)
+onnx.save(onnx_model, "VGGFace.onnx")
+print(onnx.checker.check_model(onnx_model))
 
-model3.detect_faces(image_2)
-model4 = MtCnnClient()
-model4.detect_faces(image_2);
+#onnxProgram = torch.onnx.export(model= model3,  args = torch_input,f="YoloV8.onnx", verbose=True)
+#onnxProgram.save("YoloV8.onnx")
+#image_2 = cv2.imread("lee_2.jpg")
+
+#model3.detect_faces(image_2)
+#model4 = MtCnnClient()
+#model4.detect_faces(image_2);

@@ -53,6 +53,7 @@ namespace OpenCVClr
 			vector<cv::Rect> detectFaceRect;
 			cv::Mat Face = img(cv::Range(objects[i].y, objects[i].y + objects[i].height), cv::Range(objects[i].x, objects[i].x + objects[i].width)); // Crop Image
 			ListFaces.push_back(Face);
+			std::cout << "Detected Image in coordinates with x: " << objects[i].x << " y: " << objects[i].y << " w: " << objects[i].width << " h: " << objects[i].height;
 			if (Align)
 			{
 				vector<cv::Rect> Eye_Align = Align_Face(Face);

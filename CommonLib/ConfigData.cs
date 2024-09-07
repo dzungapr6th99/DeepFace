@@ -59,7 +59,8 @@ namespace CommonLib
             MtCnnPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + configurationRoot["MtCnnPath"]?.ToString() + Path.DirectorySeparatorChar;
             ModelVerifyPath = Path.Combine(ModelPath, configurationRoot["ModelVerifyFace"]?.ToString());
             DictThreshold = configurationRoot.GetSection("Threshold").Get<Dictionary<string, Dictionary<string, float>>>();
-            IsRunOnGpu = configurationRoot["UseGpu"]?.ToString() == "true";
+            string configRunOnGpu = configurationRoot["UseGpu"]?.ToString();
+            IsRunOnGpu = configurationRoot["UseGpu"] != null ? true : false;
             LOG.log.Info("Init configuration success");
             Threshold = double.Parse(configurationRoot["Threshold:VGGFace:cosine"]);
         }
