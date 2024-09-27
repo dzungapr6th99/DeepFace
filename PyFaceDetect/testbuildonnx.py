@@ -1,7 +1,7 @@
-from ast import arg
-from deepface.basemodels import Facenet
-from deepface.basemodels import VGGFace
-import tf2onnx
+
+from deepface.models import FacialRecognition
+from deepface.models.facial_recognition import VGGFace
+#import tf2onnx
 import onnx
 import torch
 import onnxscript
@@ -10,20 +10,12 @@ import tensorflow as tf
 from deepface.commons import package_utils, folder_utils
 import onnxruntime as ort
 import cv2
-from keras.models import Model, Sequential
-from keras.layers import (
-        Convolution2D,
-        ZeroPadding2D,
-        MaxPooling2D,
-        Flatten,
-        Dropout,
-        Activation,
-    )
-from deepface.detectors.Yolo import Any, YoloClient
-from deepface.detectors.MtCnn import MTCNN, MtCnnClient
+
+#from deepface.DeepFace import Any, YoloClient
+#from deepface.DeepFace import MTCNN, MtCnnClient
 #gpuSessionOption = ort.SessionOptions.MakeSessionOptionWithCudaProvider(0)
 
-model2 = VGGFace.load_model();
+model2 = VGGFace.load_model()
 print(model2.input_shape)
 #print(model2.input)
 #model3 = YoloClient()

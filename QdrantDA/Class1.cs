@@ -8,7 +8,8 @@ namespace QdrantDA
     {
         public static void Main(string[] args)
         {
-            QdrantClient _client = new QdrantClient(new Uri("localhost"))
+            QdrantClient _client = new QdrantClient(new Uri("localhost"));
+            
 
 
 

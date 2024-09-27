@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <None Update="DetectorDll.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="DetectorDll.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -27,7 +27,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <!--<PropertyGroup>
+  <PropertyGroup>
     <DefineConstants>UNIX</DefineConstants>
-  </PropertyGroup>-->
+  </PropertyGroup>
 </Project>
