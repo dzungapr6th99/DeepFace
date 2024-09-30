@@ -118,7 +118,7 @@ namespace FaceDetectInterface
                 double distance = Distance.FindCosineDistance(outPutCheck, outPutVerify);
                 LOG.log.Info("Distance: {0}", distance);
                 return distance > ConfigData.Threshold;
-
+                 
             }
             catch (Exception ex)
             {

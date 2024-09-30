@@ -162,20 +162,34 @@ void* CreateMTCnnModel(char* path)
 
 int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& ListImage)
 {
-    MTCNNDetector* detector = (MTCNNDetector*)model;
-	std::string base64DecodeImg = base64_decode(base64Image);
-	std::vector<uchar> base64data(base64DecodeImg.begin(), base64DecodeImg.end());
-    cv::Mat img = cv::imdecode(base64data, cv::ImreadModes::IMREAD_COLOR);
-	std::vector<Face> faces = detector->detect(img, 20.f, 0.709f);
-	ListImage = new char[faces.size() * 3 * width * height];
-	for (int i = 0; i < faces.size(); i++)
+	try
 	{
-		cv::Mat ResizeFace;
-		cv::Mat face = img(faces[i].bbox.getRect());
-		cv::resize(face, ResizeFace, cv::Size(width, height));
 
-		_memccpy(ListImage, ResizeFace.data, i, width * height * 3);
-		i += width * height * 3;
+		MTCNNDetector* detector = (MTCNNDetector*)model;
+		std::string base64DecodeImg = base64_decode(base64Image);
+		std::vector<uchar> base64data(base64DecodeImg.begin(), base64DecodeImg.end());
+		cv::Mat img = cv::imdecode(base64data, cv::ImreadModes::IMREAD_COLOR);
+		std::vector<Face> faces = detector->detect(img, 20.f, 0.709f);
+		ListImage = new char[faces.size() * 3 * width * height];
+		for (int i = 0; i < faces.size(); i++)
+		{
+			cv::Mat ResizeFace;
+			cv::Mat face = img(faces[i].bbox.getRect());
+			cv::resize(face, ResizeFace, cv::Size(width, height));
+
+			_memccpy(ListImage, ResizeFace.data, i, width * height * 3);
+			i += width * height * 3;
+		}
+		return faces.size();
 	}
-	return faces.size();
+	catch (cv::Exception cvEx)
+	{
+		std::cout << "Caught cv Exception: " << cvEx.msg<< "\n";
+		return 0;
+	}
+	catch (std::exception ex)
+	{
+		std::cout << "Caught std exception: " << ex.what() << "\n";
+		return 0;
+	}
 }

@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Milvus.Client" Version="2.3.0-preview.1" />
-  </ItemGroup>
-
 </Project>

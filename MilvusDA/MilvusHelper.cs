@@ -7,72 +7,65 @@ using System.Linq;
 public class MilvusHelper
 {
     private readonly MilvusClient client;
-    private readonly Dictionary<int, string> collectionNames; // Bản đồ giữa số chiều và tên collection
+    private readonly Dictionary<string, string> collectionNames; // Bản đồ giữa số chiều và tên collection
 
     public MilvusHelper(string host = "localhost", int port = 19530)
     {
         // Kết nối đến Milvus
-       
+
         client = new MilvusClient(host);
 
         // Bản đồ số chiều và tên collection
-        collectionNames = new Dictionary<int, string>();
+        collectionNames = new Dictionary<string, string>();
     }
 
-    private async void CreateCollection(int dim)
+    public virtual MilvusCollection GetOrCreateCollection(string modelName)
     {
-        // Tạo tên collection dựa trên số chiều của vector
-        string collectionName = $"vector_collection_{dim}";
+        /*
+        Ở đâu thiết kế vector db đơn giản là mỗi collection (collection trong vector db thì tương ứng với bảng trong sql db)
+        tương ứng cho 1 loại model (do mỗi model thì có đầu ra là ma trận vector có số chiều khác nhau). 1 collection hay bảng thì 
+        có 2 field (field tương ứng với cột trong sql db), 1 cột là id, cột còn lại là thông tin vector
+         */
+        // Tạo tên collection dựa modelname
+        string collectionName = $"{modelName}";
 
         // Kiểm tra collection có tồn tại không
-        var milvusCollection = client.GetCollection(collectionName);
-        var hasCollection =  await client.HasCollectionAsync(collectionName);
+        var hasCollection =  client.HasCollectionAsync(collectionName).Result;
 
+        // Thêm collection vào database 
+        if (!collectionNames.ContainsKey(modelName))
+        {
+            collectionNames.Add(modelName, collectionName);
+        }
         if (!hasCollection)
         {
             // Định nghĩa schema cho collection
-            await client.CreateCollectionAsync(
+            var result = client.CreateCollectionAsync(
             collectionName,
             new[] {
-                FieldSchema.Create<long>("book_id", isPrimaryKey:true),
-                FieldSchema.Create<long>("word_count"),
-                FieldSchema.CreateVarchar("book_name", 256),
-                FieldSchema.CreateFloatVector("book_intro", 2)
-            }
-        );
+                FieldSchema.Create<long>("face_id", isPrimaryKey: true, autoId: true),
+                FieldSchema.CreateVarchar("face_name", 256),
+                FieldSchema.CreateFloatVector("face_vector", 2,)
+            }).Result;
+            return result;
         }
         else
         {
-
-        }
-        // Thêm collection vào bản đồ
-        if (!collectionNames.ContainsKey(dim))
-        {
-            collectionNames.Add(dim, collectionName);
+            var milvusCollection = client.GetCollection(collectionName);
+            return milvusCollection;
         }
     }
 
-    public void InsertVectors(long id, List<float[]> vectors)
+    public async void InsertVectors(string faceid, List<ReadOnlyMemory<float>> vectors, string modelName)
     {
-        // Lấy số chiều của vector đầu tiên
-        int dim = vectors[0].Length;
+        var collection = GetOrCreateCollection(modelName);
+        MutationResult result = await collection.InsertAsync(
+    new FieldData[]
+    {
 
-        // Tạo collection nếu chưa tồn tại
-        CreateCollection(dim);
-
-        // Lấy tên collection tương ứng với số chiều
-        string collectionName = collectionNames[dim];
-
-        // Tạo dữ liệu để thêm vào collection
-        var ids = Enumerable.Repeat(id, vectors.Count).ToList();
-        var insertParam = new InsertParam.Builder(collectionName)
-            .WithField("id", ids)
-            .WithField("vector", vectors)
-            .Build();
-
-        // Thêm dữ liệu vào collection
-        var result = client.Insert(insertParam);
-        Console.WriteLine($"Inserted {vectors.Count} vectors with ID {id} in collection {collectionName}.");
+        FieldData.CreateFloatVector(faceid, vectors),
+    },
+    modelName);
     }
 
     public List<long> SearchNearestVector(float[] queryVector, int topK = 1)
@@ -108,60 +101,5 @@ public class MilvusHelper
     }
 }
 
-// Ví dụ sử dụng
-class Program
-{
-    static void Main(string[] args)
-    {
-        MilvusHelper milvusHelper = new MilvusHelper();
 
-        // Tạo danh sách vector có số chiều 128
-        var vectors128 = new List<float[]>();
-        Random rand = new Random();
-        for (int i = 0; i < 10; i++)
-        {
-            float[] vector = new float[128];
-            for (int j = 0; j < 128; j++)
-            {
-                vector[j] = (float)rand.NextDouble();
-            }
-            vectors128.Add(vector);
-        }
-
-        // Thêm vector 128 chiều vào Milvus
-        milvusHelper.InsertVectors(1, vectors128);
-
-        // Tạo danh sách vector có số chiều 256
-        var vectors256 = new List<float[]>();
-        for (int i = 0; i < 10; i++)
-        {
-            float[] vector = new float[256];
-            for (int j = 0; j < 256; j++)
-            {
-                vector[j] = (float)rand.NextDouble();
-            }
-            vectors256.Add(vector);
-        }
-
-        // Thêm vector 256 chiều vào Milvus
-        milvusHelper.InsertVectors(1, vectors256);
-
-        // Tìm kiếm vector 128 chiều gần nhất
-        float[] queryVector128 = new float[128];
-        for (int j = 0; j < 128; j++)
-        {
-            queryVector128[j] = (float)rand.NextDouble();
-        }
-        var nearestId128 = milvusHelper.SearchNearestVector(queryVector128);
-        Console.WriteLine($"ID của vector 128 chiều gần nhất: {string.Join(", ", nearestId128)}");
-
-        // Tìm kiếm vector 256 chiều gần nhất
-        float[] queryVector256 = new float[256];
-        for (int j = 0; j < 256; j++)
-        {
-            queryVector256[j] = (float)rand.NextDouble();
-        }
-        var nearestId256 = milvusHelper.SearchNearestVector(queryVector256);
-        Console.WriteLine($"ID của vector 256 chiều gần nhất: {string.Join(", ", nearestId256)}");
-    }
 }
