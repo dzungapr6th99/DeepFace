@@ -28,8 +28,8 @@ namespace FaceDetectInterface
         private bool IsLoadModel = false;
         public FaceDetect(IDetectorModel p_DetectorModel)
         {
-            width = 224;
-            height = 224;
+            width = 160;
+            height = 160;
             c_DetectorModel = p_DetectorModel;
             PathModel = ConfigData.ModelVerifyPath;
             c_DetectorModel.LoadModel();
@@ -42,8 +42,8 @@ namespace FaceDetectInterface
         }
         public void LoadModel()
         {
-            width = 224;
-            height = 224;
+            width = 160;
+            height = 160;
             if (!IsLoadModel)
             {
                 if (ConfigData.IsRunOnGpu)
@@ -116,8 +116,9 @@ namespace FaceDetectInterface
                 float[] outPutCheck = TensorToFloatArray(ouputCheck[0].AsTensor<float>());
                 float[] outPutVerify = TensorToFloatArray(ouputVerify[0].AsTensor<float>());
                 double distance = Distance.FindCosineDistance(outPutCheck, outPutVerify);
+                Console.WriteLine("Distance: {0}", distance);
                 LOG.log.Info("Distance: {0}", distance);
-                return distance > ConfigData.Threshold;
+                return distance < ConfigData.Threshold;
                  
             }
             catch (Exception ex)

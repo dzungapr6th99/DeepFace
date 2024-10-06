@@ -15,13 +15,13 @@ namespace FaceDetectInterface
             Decimal a = 0;
             Decimal b = 0;
             Decimal c = 0;
-            for (int i = 0; i< sourceRepresentation.Length; i++)
+            /*for (int i = 0; i< sourceRepresentation.Length; i++)
             {
                 if (sourceRepresentation[i] + testRepresentation[i] > 0)
                 {
                     Console.WriteLine("{0}: source: {1} test: {2}",i, sourceRepresentation[i], testRepresentation[i]);
                 }    
-            }    
+            }   */ 
             for (int i = 0; i < sourceRepresentation.Length; i++)
             {
                 a += (Decimal)sourceRepresentation[i] * (Decimal)testRepresentation[i];

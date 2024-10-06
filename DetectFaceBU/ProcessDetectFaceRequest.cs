@@ -26,7 +26,8 @@ namespace DetectFaceBU
             {
 
                 LOG.log.Info("Start Process request {0}", request.RequestID);
-
+                LOG.log.Debug("Image check: {0}", request.Base64ImgCheck);
+                LOG.log.Debug("Image verify: {0}", request.Base64ImgVerify);
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
                 bool IsVerified = c_FaceDetect.Verify(request.Base64ImgVerify, request.Base64ImgCheck);
@@ -37,7 +38,7 @@ namespace DetectFaceBU
                     ReturnCode = 1,
                     ReturnMessage = "Success"
                 };
-                LOG.log.Info("Process request {0} success in {1} ms", request.RequestID, stopwatch.ElapsedMilliseconds);
+                LOG.log.Info("Process request {0} success in {1} ms and get result {2}", request.RequestID, stopwatch.ElapsedMilliseconds, response.Verified);
                 return response;
             }
             catch (Exception ex)
