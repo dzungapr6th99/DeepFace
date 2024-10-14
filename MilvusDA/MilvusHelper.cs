@@ -3,23 +3,50 @@ using Milvus.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 
 public class MilvusHelper
 {
     private readonly MilvusClient client;
-    private readonly Dictionary<string, string> collectionNames; // Bản đồ giữa số chiều và tên collection
-
-    public MilvusHelper(string host = "localhost", int port = 19530)
+    private Dictionary<string, CollectionManagement> loadedCollections;
+    private readonly bool _isLoadMode;
+    private readonly bool _isReleaseCollection;
+    private readonly long _tickPerScanPeriod;
+    /// <summary>
+    /// Function create MilvusHelper
+    /// </summary>
+    /// <param name="ip">IP Address</param>
+    /// <param name="port">Port</param>
+    /// <param name="useSSL">is use SSL?</param>
+    /// <param name="isLoadMode">is use load mode? if true, the service will request milvus load collection to improve performance, but the milvus server will consume more resource</param>
+    /// <param name="isReleaseCollection">is use mode release collection, if true, when collection is not called after tickPerScanPeriod, it will be released</param>
+    /// <param name="tickPerScanPeriod">count by tick</param>
+    public MilvusHelper(string ip = "localhost", int port = 19530, bool useSSL = false, bool isLoadMode = false, bool isReleaseCollection = true, long tickPerScanPeriod = 30 * 60 * TimeSpan.TicksPerSecond)
     {
         // Kết nối đến Milvus
 
-        client = new MilvusClient(host);
-
-        // Bản đồ số chiều và tên collection
-        collectionNames = new Dictionary<string, string>();
+        client = new MilvusClient(ip, port, useSSL);
+        loadedCollections = new Dictionary<string, CollectionManagement>();
+        _isLoadMode = isLoadMode;
+        _isReleaseCollection = isReleaseCollection;
+        _tickPerScanPeriod = tickPerScanPeriod;
     }
 
-    public virtual MilvusCollection GetOrCreateCollection(string modelName, int dim)
+    private void ManageLoadCollection()
+    {
+        while (_isLoadMode && _isReleaseCollection)
+        {
+            foreach (var manageCollection in loadedCollections.Values)
+            {
+                if (DateTime.Now.Ticks - manageCollection.LastTimeUsed.Ticks > _tickPerScanPeriod)
+                {
+                    var released = manageCollection.ReleaseCollection();
+                }
+            }
+        }
+    }
+
+    public virtual MilvusCollection? GetOrCreateCollection(string collectionName, int dim, string vectorFieldName, params Tuple<string, Type>[] otherField)
     {
         /*
         Ở đâu thiết kế vector db đơn giản là mỗi collection (collection trong vector db thì tương ứng với bảng trong sql db)
@@ -27,67 +54,217 @@ public class MilvusHelper
         có 2 field (field tương ứng với cột trong sql db), 1 cột là id, cột còn lại là thông tin vector
          */
         // Tạo tên collection dựa modelname
-        string collectionName = $"{modelName}";
 
         // Kiểm tra collection có tồn tại không
         var hasCollection = client.HasCollectionAsync(collectionName).Result;
 
-        // Thêm collection vào database 
-        if (!collectionNames.ContainsKey(modelName))
-        {
-            collectionNames.Add(modelName, collectionName);
-        }
         if (!hasCollection)
         {
+            if (dim == 0)
+            {
+                return null;
+            }
             // Định nghĩa schema cho collection
-            var result = client.CreateCollectionAsync(
-            collectionName,
-            new[] {
-                FieldSchema.Create<long>("face_id", isPrimaryKey: true, autoId: true),
-                FieldSchema.CreateVarchar("face_name", 256),
-                FieldSchema.CreateFloatVector("face_vector", dim)
-            }).Result;
-            return result;
+            var createCollection = client.CreateCollectionAsync(
+            collectionName, CreateCollectionDetail(collectionName, dim, otherField)
+
+            ).Result;
+            if (createCollection != null)
+            {
+                var collectionManagement = new CollectionManagement(createCollection);
+                loadedCollections.Add(collectionName, collectionManagement);
+                return collectionManagement.GetCollection();
+            }
+            else
+            {
+                return createCollection;
+            }
         }
         else
         {
-            var milvusCollection = client.GetCollection(collectionName);
-            return milvusCollection;
+
+            return GetCollection(collectionName);
         }
     }
 
-    public async void InsertVectors(string faceid, List<ReadOnlyMemory<float>> vectors, string modelName)
+    public virtual MilvusCollection? GetCollection(string collectionName)
     {
-        var collection = GetOrCreateCollection(modelName, vectors[0].Length);
-        MutationResult result = await collection.InsertAsync(new FieldData[]
+
+        // Kiểm tra xem collection đã được load chưa
+        if (loadedCollections.ContainsKey(collectionName))
         {
-            FieldData.CreateFloatVector("face_id", vectors),
-        },
-    modelName);
+            return loadedCollections[collectionName].GetCollection();
+        }
+
+        // Kiểm tra collection có tồn tại không
+        var hasCollection = client.HasCollectionAsync(collectionName).Result;
+        if (hasCollection)
+        {
+            var milvusCollection = client.GetCollection(collectionName);
+            CollectionManagement collectionManage = new CollectionManagement(milvusCollection);
+            if (_isLoadMode)
+            {
+                collectionManage.LoadColection();
+            }
+            loadedCollections.Add(collectionName, collectionManage);
+            return collectionManage.GetCollection();
+        }
+        else
+        {
+            return null;
+        }
     }
 
-    public async List<long> SearchNearestVector(List<ReadOnlyMemory<float>> queryVector, string modelName,int topK = 1)
+
+
+    public async Task<bool> Insert(string collectionName, Tuple<string, ReadOnlyMemory<float>> vector, params Tuple<string, object>[] fields)
     {
-        // Lấy số chiều của vector đầu vào
-        int dim = queryVector.Length;
+        var collection = GetCollection(collectionName);
+        if (collection == null)
+        {
+            return false;
+        }
+
+        MutationResult result = await collection.InsertAsync(CreateRecord(vector, fields), collectionName);
+        return result.InsertCount == 1;
+    }
+
+
+
+
+    public async Task<object> Search(ReadOnlyMemory<float> queryVector, string collectionName, string vectorFieldName, int topK = 1, float threshold = float.MaxValue, params string[] fieldNames)
+    {
+
 
         // Kiểm tra xem collection cho số chiều này có tồn tại không
-        if (!collectionNames.ContainsKey(modelName))
-        {
-            throw new Exception($"No collection found for vectors with dimension {dim}.");
-        }
-
-        // Lấy tên collection tương ứng
-        string collectionName = collectionNames[modelName];
+        var collection = GetCollection(collectionName);
+        MilvusCollectionDescription collecitonInfo = await collection.DescribeAsync();
 
         // Định nghĩa tham số tìm kiếm
-        SearchParameters parammeters = new SearchParameters()
+        SearchParameters parammeters = new SearchParameters();
+        var searchParameters = new SearchParameters()
         {
-            
+            OutputFields = { "*" },
+            ConsistencyLevel = ConsistencyLevel.Strong,
+            Offset = 5,
+            ExtraParameters = { ["nprobe"] = "1024" }
         };
-        var result = await client.GetCollection(modelName).SearchAsync<float>(vectorFieldName: "face_id", vectors: queryVector, SimilarityMetricType.Cosine, limit: 1);
-        result.
-        return nearestIds;
+        List<ReadOnlyMemory<float>> inputQueryVector = new List<ReadOnlyMemory<float>>() { queryVector };
+
+        var result = await collection.SearchAsync<float>(vectorFieldName: vectorFieldName, vectors: inputQueryVector, SimilarityMetricType.Cosine, limit: 1,
+                                                            parammeters= searchParameters);
+        if (result.Scores[0] < threshold)
+        {
+
+            for (int i = 0; i < result.FieldsData.Count; i++)
+            {
+                FieldData fieldData = result.FieldsData[i];
+                result.FieldsData.
+            }
+        }
+        //result.FieldsData.OrderBy()
+        return result.Ids.StringIds?.FirstOrDefault();
     }
+
+    private FieldData[] CreateRecord(Tuple<string, ReadOnlyMemory<float>> vector, params Tuple<string, object>[] fields)
+    {
+        List<FieldData> fieldDatas = new List<FieldData>();
+        for (int i = 0; i < fields.Count(); i++)
+        {
+            if (fields[i].Item2 is string)
+            {
+                string[] fieldItem = new string[] { (string)fields[i].Item2 };
+                fieldDatas.Add(FieldData.CreateVarChar(fields[i].Item1, fieldItem));
+            }
+            else if (fields[i].Item2 is long)
+            {
+                long[] fieldItem = new long[] { (long)fields[i].Item2 };
+                fieldDatas.Add(FieldData.Create<long>(fields[i].Item1, fieldItem));
+            }
+            else if (fields[i].Item2 is int)
+            {
+                int[] fieldItem = new int[] { (int)fields[i].Item2 };
+                fieldDatas.Add(FieldData.Create<int>(fields[i].Item1, fieldItem));
+            }
+        }
+        fieldDatas.Add(FieldData.CreateFloatVector(vector.Item1, new List<ReadOnlyMemory<float>>() { vector.Item2 }));
+        return fieldDatas.ToArray();
+    }
+
+    private FieldSchema[] CreateCollectionDetail(string vectorName, int dim, params Tuple<string, Type>[] fields)
+    {
+        List<FieldSchema> fieldDatas = new List<FieldSchema>();
+        for (int i = 0; i < fields.Count(); i++)
+        {
+            if (fields[i].Item2 == typeof(string))
+            {
+                fieldDatas.Add(FieldSchema.CreateVarchar(fields[i].Item1, 32));
+            }
+            else if (fields[i].Item2 == typeof(long))
+            {
+                fieldDatas.Add(FieldSchema.Create<long>(fields[i].Item1));
+            }
+            else if (fields[i].Item2 == typeof(int))
+            {
+                fieldDatas.Add(FieldSchema.Create<int>(fields[i].Item1));
+            }
+        }
+        fieldDatas.Add(FieldSchema.CreateFloatVector(vectorName, dim));
+        return fieldDatas.ToArray();
+    }
+
+    internal class CollectionManagement
+    {
+        private MilvusCollection? Collection { get; set; }
+
+        public DateTime LastTimeUsed { get; set; }
+
+        private bool isLoaded { get; set; } = false;
+
+        public CollectionManagement(MilvusCollection collection)
+        {
+            this.Collection = collection;
+            LastTimeUsed = DateTime.Now;
+        }
+
+        public MilvusCollection? GetCollection()
+        {
+            LastTimeUsed = DateTime.Now;
+            return this.Collection;
+        }
+
+        public bool LoadColection()
+        {
+            if (isLoaded)
+            {
+                LastTimeUsed = DateTime.Now;
+                return true;
+            }
+
+            else
+            {
+                var result = Collection.LoadAsync();
+                isLoaded = true;
+                return isLoaded;
+            }
+        }
+
+        public bool ReleaseCollection()
+        {
+            if (isLoaded)
+            {
+                var result = Collection.ReleaseAsync();
+                isLoaded = false;
+                return true;
+            }
+            else
+            {
+                isLoaded = false;
+                return true;
+            }
+
+        }
+    }
+
 }
 
