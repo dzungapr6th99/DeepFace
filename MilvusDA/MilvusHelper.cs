@@ -1,17 +1,19 @@
 ﻿
 using Milvus.Client;
+using MilvusDA.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 
-public class MilvusHelper
+public class MilvusHelper : IMilvusHelper
 {
     private readonly MilvusClient client;
     private Dictionary<string, CollectionManagement> loadedCollections;
     private readonly bool _isLoadMode;
     private readonly bool _isReleaseCollection;
     private readonly long _tickPerScanPeriod;
+    private Thread _manageCollectionThread;
     /// <summary>
     /// Function create MilvusHelper
     /// </summary>
@@ -30,6 +32,13 @@ public class MilvusHelper
         _isLoadMode = isLoadMode;
         _isReleaseCollection = isReleaseCollection;
         _tickPerScanPeriod = tickPerScanPeriod;
+    }
+
+    public void StartManageCollection()
+    {
+        _manageCollectionThread = new Thread(ManageLoadCollection);
+        _manageCollectionThread.IsBackground = true;
+        _manageCollectionThread.Start();
     }
 
     private void ManageLoadCollection()
@@ -129,7 +138,7 @@ public class MilvusHelper
         return result.InsertCount == 1;
     }
 
-
+    
 
 
     public async Task<object> Search(ReadOnlyMemory<float> queryVector, string collectionName, string vectorFieldName, int topK = 1, float threshold = float.MaxValue, params string[] fieldNames)
@@ -153,15 +162,7 @@ public class MilvusHelper
 
         var result = await collection.SearchAsync<float>(vectorFieldName: vectorFieldName, vectors: inputQueryVector, SimilarityMetricType.Cosine, limit: 1,
                                                             parammeters= searchParameters);
-        if (result.Scores[0] < threshold)
-        {
-
-            for (int i = 0; i < result.FieldsData.Count; i++)
-            {
-                FieldData fieldData = result.FieldsData[i];
-                result.FieldsData.
-            }
-        }
+        result.FieldsData[0].ToString();
         //result.FieldsData.OrderBy()
         return result.Ids.StringIds?.FirstOrDefault();
     }
@@ -215,7 +216,7 @@ public class MilvusHelper
 
     internal class CollectionManagement
     {
-        private MilvusCollection? Collection { get; set; }
+        private MilvusCollection Collection { get; set; }
 
         public DateTime LastTimeUsed { get; set; }
 
@@ -227,7 +228,7 @@ public class MilvusHelper
             LastTimeUsed = DateTime.Now;
         }
 
-        public MilvusCollection? GetCollection()
+        public MilvusCollection GetCollection()
         {
             LastTimeUsed = DateTime.Now;
             return this.Collection;

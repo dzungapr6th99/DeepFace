@@ -9,6 +9,7 @@ namespace DetectFaceBU
     public interface IProcessDetectFaceRequest
     {
         public Task<VerifyFaceResponse> Api1DetectFaceBU(VerifyFaceRequest request);
+        public Task<EmbedingFaceResponse> Api2EmbedingFaceBU(EmbedingFaceRequest request);
     }
     public class ProcessDetectFaceRequest:IProcessDetectFaceRequest
     {
@@ -62,6 +63,23 @@ namespace DetectFaceBU
                 };
             }
 
+        }
+
+        public async Task<EmbedingFaceResponse> Api2EmbedingFaceBU(EmbedingFaceRequest request)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                LOG.log.Error(ex);
+                return new EmbedingFaceResponse()
+                {
+                    Code = -999,
+                    Message = ex.Message,
+                };
+            }
         }
 
         public async Task<DetectFaceResponse> Api2DetectFaceValid(DetectFaceRequest request)

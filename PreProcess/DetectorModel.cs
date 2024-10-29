@@ -90,6 +90,7 @@ namespace PreProcess
                 throw;
             }
         }
+
         public byte[] GetImgDataArray(int NumFaces, int width, int height, IntPtr dataPointer)
         {
 

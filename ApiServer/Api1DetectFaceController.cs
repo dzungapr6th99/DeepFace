@@ -26,5 +26,12 @@ namespace ApiServer
             VerifyFaceResponse response = await c_ProcessDetectFaceReq.Api1DetectFaceBU(request);
             return response;
         }
+
+        [HttpPost]
+        [Route("api1/embeding")]
+        public async Task<EmbedingFaceResponse> Api2Embeding(EmbedingFaceRequest request)
+        {
+            return new EmbedingFaceResponse();
+        }
     }
 }
