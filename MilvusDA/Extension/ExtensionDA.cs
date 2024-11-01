@@ -2,6 +2,9 @@
 using Milvus.Client;
 using MilvusDA.CustomAttributes;
 using MilvusDA.Interface;
+using MilvusDA.ObjectApi;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +16,11 @@ namespace MilvusDA.Extension
 {
     public static class ExtensionDA
     {
+        private static JsonSerializerSettings _jsonCamelCaseSetting = new JsonSerializerSettings()
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            NullValueHandling = NullValueHandling.Include
+        };
         public static MilvusCollection? GetOrCreateCollection<T>(this IMilvusHelper milvusHelper) where T : class
         {
             string collectionName = GetCollectionName(typeof(T));
@@ -40,9 +48,31 @@ namespace MilvusDA.Extension
             return false;
         }
 
-        public static T Search<T>(this IMilvusHelper milvusHelper,T entity)
+        public static async Task<bool> InsertPost<T>(IMilvusHelper milvusHelper, T data) where T: class
         {
-            milvusHelper.Search(entity,)
+            string collectionName = GetCollectionName(typeof(T));
+            string jsonObjString = JsonConvert.SerializeObject(data, Formatting.Indented, _jsonCamelCaseSetting);
+            string response = await milvusHelper.PostAsync("Insert", jsonObjString, collectionName);
+            InsertResponse responseObj = JsonConvert.DeserializeObject<InsertResponse>(response);
+            return responseObj?.Code == 1;
+        }
+
+        public static async Task<List<T>> Search<T>(this IMilvusHelper milvusHelper, List<object> data) where T : class
+        {
+            string collectionName = GetCollectionName(typeof(T));
+            Type type = typeof(T);
+            
+            SearchObjectApi searchApi = new SearchObjectApi()
+            {
+                CollectionName = collectionName,
+                Data = data,
+                AnnsField = GetVectorFieldName(typeof(T))?? string.Empty,
+                OutputFields = type.GetProperties().Select(x=> x.Name).ToList()
+            };
+            string jsonObjString = JsonConvert.SerializeObject(searchApi, Formatting.Indented, _jsonCamelCaseSetting);
+            string response = await milvusHelper.PostAsync("Search", jsonObjString, collectionName);
+            SearchResponse<T> responseObj = JsonConvert.DeserializeObject<SearchResponse<T>>(response);
+            return responseObj?.Data ?? new List<T>();
         } 
 
         private static string GetCollectionName(this Type type)
@@ -86,7 +116,19 @@ namespace MilvusDA.Extension
             return false;
 
         }
-
+        private static string? GetVectorFieldName(this Type type)
+        {
+            var properties = type.GetProperties();
+            foreach (var prop in properties)
+            {
+                var dbFieldAttribute = (DbFieldAttribute)prop.GetCustomAttribute(type);
+                if (dbFieldAttribute != null && dbFieldAttribute.IsVector)
+                {
+                    return prop.Name;
+                }
+            }
+            return null;
+        }
 
     }
 }

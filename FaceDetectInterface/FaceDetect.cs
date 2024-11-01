@@ -88,40 +88,28 @@ namespace FaceDetectInterface
             {
                 (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64, width, height);
                 LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
+                if (numFaceDb <= 0)
+                    return -1;
                 List<byte[]> FacesData = new List<byte[]>();
                 for (int i = 0; i < numFaceDb; i++)
                 {
                     FacesData.Add(DataDb.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
                 }
                 Tensor<float> InputCheck = ByteArray2Tensor(1, FacesData[0], width, height);
-                Tensor<float> InputVerify = ByteArray2Tensor(1, FacesData[1], width, height);
 
                 var inputs_Check = new List<NamedOnnxValue>
                 {
                     NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputCheck)
                 };
-                var ouputCheck = c_InferenceSession.Run(inputs_Check);
+                var outputTensor = c_InferenceSession.Run(inputs_Check);
 
-                var inputs_Verify = new List<NamedOnnxValue>
-                {
-                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputVerify)
-                };
-                var ouputVerify = c_InferenceSession.Run(inputs_Verify);
-                float[] outPutCheck = TensorToFloatArray(ouputCheck[0].AsTensor<float>());
-                float[] outPutVerify = TensorToFloatArray(ouputVerify[0].AsTensor<float>());
-                double distance = Distance.FindCosineDistance(outPutCheck, outPutVerify);
-                Console.WriteLine("Distance: {0}", distance);
-                LOG.log.Info("Distance: {0}", distance);
+                outputTensor[0].AsTensor().To
                 return 1;
 
             }
             catch (Exception ex)
             {
                 LOG.log.Info(ex);
-                throw;
-            }
-            catch
-            {
                 throw;
             }
         }
@@ -150,14 +138,14 @@ namespace FaceDetectInterface
                 {
                     NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputCheck)
                 };
-                var ouputCheck = c_InferenceSession.Run(inputs_Check);
+                var outputTensor = c_InferenceSession.Run(inputs_Check);
 
                 var inputs_Verify = new List<NamedOnnxValue>
                 {
                     NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputVerify)
                 };
                 var ouputVerify = c_InferenceSession.Run(inputs_Verify);
-                float[] outPutCheck = TensorToFloatArray(ouputCheck[0].AsTensor<float>());
+                float[] outPutCheck = TensorToFloatArray(outputTensor[0].AsTensor<float>());
                 float[] outPutVerify = TensorToFloatArray(ouputVerify[0].AsTensor<float>());
                 double distance = Distance.FindCosineDistance(outPutCheck, outPutVerify);
                 Console.WriteLine("Distance: {0}", distance);

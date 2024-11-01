@@ -14,5 +14,6 @@ namespace MilvusDA.Interface
         MilvusCollection? GetCollection(string collectionName);
         Task<bool> Insert(string collectionName, Tuple<string, ReadOnlyMemory<float>> vector, params Tuple<string, object>[] fields);
         Task<object> Search(ReadOnlyMemory<float> queryVector, string collectionName, string vectorFieldName, int topK = 1, float threshold = float.MaxValue, params string[] fieldNames);
+        Task<string> PostAsync(string method, string jsonObject, string collectionName);
     }
 }
