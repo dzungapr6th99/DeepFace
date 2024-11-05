@@ -5,7 +5,7 @@
 using namespace std;
 
 #ifndef CPPEXPORT
-# if (defined _WIN32 || defined WINCE || defined __CYGWIN__) && defined(CVAPI_EXPORTS)
+# if (defined _WIN32 || defined WINCE || defined __CYGWIN__ || defined _WIN64)// && defined(CVAPI_EXPORTS)
 #   define CPPEXPORT __declspec(dllexport)
 # elif defined __GNUC__ && __GNUC__ >= 4 && (defined(CVAPI_EXPORTS) || defined(__APPLE__))
 #   define CPPEXPORT __attribute__ ((visibility ("default")))

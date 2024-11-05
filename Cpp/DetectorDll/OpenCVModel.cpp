@@ -51,6 +51,7 @@ namespace OpenCVClr
 		{
 			cv::Mat Eye;
 			vector<cv::Rect> detectFaceRect;
+			std::cout << "Face " << i << "th is locate at x: " << objects[i].x << " y: " << objects[i].y << " w: " << objects[i].width << " h: " << objects[i].height<< '\n';
 			cv::Mat Face = img(cv::Range(objects[i].y, objects[i].y + objects[i].height), cv::Range(objects[i].x, objects[i].x + objects[i].width)); // Crop Image
 			ListFaces.push_back(Face);
 			if (Align)
@@ -183,14 +184,14 @@ int DetectImage(void* model, char* base64Image, int length, int width, int heigh
 	model1->Detect(base64Image, length, false, EyesCoordinate, Faces);
 	/*if (Faces.size() == 0)
 		return 0;*/
-	ListImage = new unsigned char[Faces.size() * 244 * 244 * 3];
+	ListImage = new unsigned char[Faces.size() * width * height * 3];
 	int index = 0;
 	for (int i = 0; i < Faces.size(); i++)
 	{
 		cv::Mat ResizeFace;
 		cv::resize(Faces[i], ResizeFace, cv::Size(width, height));
 
-		_memccpy(ListImage, Faces[i].data, i, width * height * 3);
+		_memccpy(ListImage, ResizeFace.data, i, width * height * 3);
 		i += width * height * 3;
 
 	}

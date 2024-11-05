@@ -8,14 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.16.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\CommonLib\CommonLib.csproj" />
     <ProjectReference Include="..\ShareMemoryData\ShareMemoryData.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="DetectorDll.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="DetectorDll.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="MtCnnDll.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
+  <PropertyGroup>
+    <DefineConstants>UNIX</DefineConstants>
+  </PropertyGroup>
 </Project>

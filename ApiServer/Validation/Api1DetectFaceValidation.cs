@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ApiServer.Validation
 {
-    public class Api1DetectFaceValidation : AbstractValidator<DetectFaceRequest>
+    public class Api1DetectFaceValidation : AbstractValidator<VerifyFaceRequest>
     {
         public Api1DetectFaceValidation()
         {

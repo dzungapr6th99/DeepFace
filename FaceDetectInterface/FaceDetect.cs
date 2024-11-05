@@ -15,6 +15,7 @@ namespace FaceDetectInterface
     {
         public bool Verify(string ImgBase64Db, string ImgBase64Input);
         public void LoadModel();
+        bool Detect(string ImgBase64);
     }
 
     public class FaceDetect : IFaceDetect
@@ -27,8 +28,8 @@ namespace FaceDetectInterface
         private bool IsLoadModel = false;
         public FaceDetect(IDetectorModel p_DetectorModel)
         {
-            width = 224;
-            height = 224;
+            width = 160;
+            height = 160;
             c_DetectorModel = p_DetectorModel;
             PathModel = ConfigData.ModelVerifyPath;
             c_DetectorModel.LoadModel();
@@ -41,8 +42,8 @@ namespace FaceDetectInterface
         }
         public void LoadModel()
         {
-            width = 224;
-            height = 224;
+            width = 160;
+            height = 160;
             if (!IsLoadModel)
             {
                 if (ConfigData.IsRunOnGpu)
@@ -62,36 +63,105 @@ namespace FaceDetectInterface
             IsLoadModel = true;
         }
 
+        public bool Detect(string ImgBase64)
+        {
+            try
+            {
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64, width, height);
+                if (numFaceDb >= 0)
+                    return true;
+                else
+                    return false;
+
+            }
+            catch(Exception ex)
+            {
+                LOG.log.Error(ex);
+                return false;
+            }
+
+        }
+
+        public int Embeding(string ImgBase64)
+        {
+            try
+            {
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64, width, height);
+                LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
+                if (numFaceDb <= 0)
+                    return -1;
+                List<byte[]> FacesData = new List<byte[]>();
+                for (int i = 0; i < numFaceDb; i++)
+                {
+                    FacesData.Add(DataDb.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
+                }
+                Tensor<float> InputCheck = ByteArray2Tensor(1, FacesData[0], width, height);
+
+                var inputs_Check = new List<NamedOnnxValue>
+                {
+                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputCheck)
+                };
+                var outputTensor = c_InferenceSession.Run(inputs_Check);
+
+                outputTensor[0].AsTensor().To
+                return 1;
+
+            }
+            catch (Exception ex)
+            {
+                LOG.log.Info(ex);
+                throw;
+            }
+        }
+
         public bool Verify(string ImgBase64Db, string ImgBase64Input)
         {
-            (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64Db, width, height);
-            LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
-            (int numFaceInput, byte[] DataInput) = c_DetectorModel.Detect(ImgBase64Input, width, height);
-            LOG.log.Info("ImgBaseInpit detected {0} faces", numFaceInput);
-            List<byte[]> FacesData = new List<byte[]>();
-            FacesData.Add(DataDb.AsSpan().Slice(0 , width * height * 3).ToArray());
-            FacesData.Add(DataInput.AsSpan().Slice(0, width * height * 3).ToArray());
-            for (int i = 0; i < numFaceDb; i++)
+            try
             {
-                FacesData.Add(DataDb.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
-            }
-            for (int i = 0; i < numFaceInput; i++)
-            {
-                FacesData.Add(DataInput.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
-            }
-            Tensor<float> InputInference = ByteArraysToTensor(FacesData, width, height);
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64Db, width, height);
+                LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
+                (int numFaceInput, byte[] DataInput) = c_DetectorModel.Detect(ImgBase64Input, width, height);
+                LOG.log.Info("ImgBaseInpit detected {0} faces", numFaceInput);
+                List<byte[]> FacesData = new List<byte[]>();
+                for (int i = 0; i < numFaceDb; i++)
+                {
+                    FacesData.Add(DataDb.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
+                }
+                for (int i = 0; i < numFaceInput; i++)
+                {
+                    FacesData.Add(DataInput.AsSpan().Slice(i * (width * height * 3), width * height * 3).ToArray());
+                }
+                Tensor<float> InputCheck = ByteArray2Tensor(1 ,FacesData[0], width, height);
+                Tensor<float> InputVerify = ByteArray2Tensor(1 ,FacesData[1], width, height);
 
-            var inputs = new List<NamedOnnxValue>
+                var inputs_Check = new List<NamedOnnxValue>
+                {
+                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputCheck)
+                };
+                var outputTensor = c_InferenceSession.Run(inputs_Check);
+
+                var inputs_Verify = new List<NamedOnnxValue>
+                {
+                    NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputVerify)
+                };
+                var ouputVerify = c_InferenceSession.Run(inputs_Verify);
+                float[] outPutCheck = TensorToFloatArray(outputTensor[0].AsTensor<float>());
+                float[] outPutVerify = TensorToFloatArray(ouputVerify[0].AsTensor<float>());
+                double distance = Distance.FindCosineDistance(outPutCheck, outPutVerify);
+                Console.WriteLine("Distance: {0}", distance);
+                LOG.log.Info("Distance: {0}", distance);
+                return distance < ConfigData.Threshold;
+                 
+            }
+            catch (Exception ex)
             {
-                NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputInference)
-            };
-            var ouputReference = c_InferenceSession.Run(inputs);
-            //Console.WriteLine("Dimension {0} | {1}",ouputReference[0].AsTensor<float>().Dimensions[0], ouputReference[0].AsTensor<float>().Dimensions[1]);
-            //float[] floatOutPut = ouputReference[0].AsTensor<float>().ToArray();
-            List<float[]> outPutDir = TensorToListOfArrays(ouputReference[0].AsTensor<float>());
-            double distance = Distance.FindCosineDistance(outPutDir[0], outPutDir[1]);
-            LOG.log.Info("Distance: {0}", distance);
-            return distance > 0.069;
+                LOG.log.Info(ex);
+                throw;
+            }
+            catch
+            {
+                throw;
+            }
 
         }
 
@@ -158,6 +228,7 @@ namespace FaceDetectInterface
 
             return floatList;
         }
+
         public float[] TensorToFloatArray(Tensor<float> tensor)
         {
             // Get the array of float values from the tensor

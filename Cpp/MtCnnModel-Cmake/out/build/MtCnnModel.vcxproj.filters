@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\detector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\onet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\pnet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\rnet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\detector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\face.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\onet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\pnet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\rnet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\DzungApr6th_git\DeepFace\Cpp\MtCnnModel-Cmake\MtCnnModel\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{696D55DA-C452-35AA-9E13-14CA2FF544BC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{C85EC02F-C4FF-335A-97EE-054A65D280FC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

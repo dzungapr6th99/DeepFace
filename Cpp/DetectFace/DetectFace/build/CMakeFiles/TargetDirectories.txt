@@ -1,0 +1,3 @@
+D:/DzungApr6th_git/DetectFace/DetectFace/build/CMakeFiles/DetectFace.dir
+D:/DzungApr6th_git/DetectFace/DetectFace/build/CMakeFiles/ALL_BUILD.dir
+D:/DzungApr6th_git/DetectFace/DetectFace/build/CMakeFiles/ZERO_CHECK.dir

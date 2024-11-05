@@ -16,6 +16,21 @@ using System.Runtime.CompilerServices;
 
 namespace CommonLib
 {
+    public class Threshold
+    {
+        public double cosine { get; set; }
+        public double euclidean { get; set; }
+        public double euclidean_l2 { get; set; }
+    }
+
+    public class ModelInfo
+    {
+        public string Name { get; set; }
+        public Threshold Threshold { get; set; }
+        public int Dim { get; set; }
+    }
+
+  
     public class ConfigData
     {
         public static char SOH;
@@ -28,16 +43,23 @@ namespace CommonLib
         public static string ModelPath;
         public static bool IsRunOnGpu = false;
         public static Dictionary<string, Dictionary<string, float>> DictThreshold;
+        public static Dictionary<string, ModelInfo> DictModelInfo;
+        public static string MtCnnPath;
+        public static double Threshold;
         public static void InitConfigData(IConfigurationRoot configurationRoot)
         {
+            string runOnGpu = configurationRoot["UseGpu"]?.ToString();
             LOG.log.Info("Start init");
             ModelPath = configurationRoot["ModelPath"]?.ToString();
             ModelDetector_Face_Path = Path.Combine(ModelPath, configurationRoot["ModelFaceDetector"]?.ToString());
             ModelDetector_Eye_Path = Path.Combine(ModelPath, configurationRoot["ModelEyesDetector"]?.ToString());
+            MtCnnPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + configurationRoot["MtCnnPath"]?.ToString() + Path.DirectorySeparatorChar;
             ModelVerifyPath = Path.Combine(ModelPath, configurationRoot["ModelVerifyFace"]?.ToString());
             DictThreshold = configurationRoot.GetSection("Threshold").Get<Dictionary<string, Dictionary<string, float>>>();
-            IsRunOnGpu = configurationRoot["UseGpu"]?.ToString() == "true";
+            string configRunOnGpu = configurationRoot["UseGpu"]?.ToString();
+            IsRunOnGpu = (runOnGpu != null && runOnGpu == "true")? true : false;
             LOG.log.Info("Init configuration success");
+            Threshold = double.Parse(configurationRoot["Threshold:VGGFace:cosine"]);
         }
     }
 }
