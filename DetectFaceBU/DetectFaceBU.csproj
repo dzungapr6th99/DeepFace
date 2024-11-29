@@ -10,6 +10,7 @@
     <ProjectReference Include="..\DetectFaceObject\DetectFaceObject.csproj" />
     <ProjectReference Include="..\FaceDetectInterface\FaceDetectInterface.csproj" />
     <ProjectReference Include="..\PreProcess\PreProcess.csproj" />
+    <ProjectReference Include="..\VectorDbObj\VectorDbObj.csproj" />
   </ItemGroup>
 
 </Project>

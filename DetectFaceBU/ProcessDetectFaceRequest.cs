@@ -1,9 +1,11 @@
 ﻿using CommonLib;
 using DetectFaceObject;
 using FaceDetectInterface;
+using MilvusDA.Interface;
 using PreProcess;
 using System.Diagnostics;
-
+using VectorDbObj;
+using MilvusDA.Extension;
 namespace DetectFaceBU
 {
     public interface IProcessDetectFaceRequest
@@ -11,14 +13,16 @@ namespace DetectFaceBU
         public Task<VerifyFaceResponse> Api1DetectFaceBU(VerifyFaceRequest request);
         public Task<EmbedingFaceResponse> Api2EmbedingFaceBU(EmbedingFaceRequest request);
     }
-    public class ProcessDetectFaceRequest:IProcessDetectFaceRequest
+    public class ProcessDetectFaceRequest : IProcessDetectFaceRequest
     {
-        private readonly IDetectorModel c_DetectorModel;
-        private readonly IFaceDetect c_FaceDetect;
-        public ProcessDetectFaceRequest(IDetectorModel p_DetectorModel , IFaceDetect p_FaceDetect)
+        private readonly IDetectorModel _detectorModel;
+        private readonly IFaceDetect _faceDetectModel;
+        private readonly IMilvusHelper _milvusHelper;
+        public ProcessDetectFaceRequest(IDetectorModel p_DetectorModel, IFaceDetect p_FaceDetect, IMilvusHelper milvusHelper)
         {
-            c_DetectorModel = p_DetectorModel;  
-            c_FaceDetect = p_FaceDetect;
+            _detectorModel = p_DetectorModel;
+            _faceDetectModel = p_FaceDetect;
+            _milvusHelper = milvusHelper;
         }
         public async Task<VerifyFaceResponse> Api1DetectFaceBU(VerifyFaceRequest request)
         {
@@ -31,7 +35,7 @@ namespace DetectFaceBU
                 LOG.log.Debug("Image verify: {0}", request.Base64ImgVerify);
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
-                bool IsVerified = c_FaceDetect.Verify(request.Base64ImgVerify, request.Base64ImgCheck);
+                bool IsVerified = _faceDetectModel.Verify(request.Base64ImgVerify, request.Base64ImgCheck);
                 stopwatch.Stop();
                 VerifyFaceResponse response = new VerifyFaceResponse()
                 {
@@ -69,7 +73,29 @@ namespace DetectFaceBU
         {
             try
             {
-
+                List<float>? embedingVector = await Task.Run(()=> _faceDetectModel.Embeding(request.ImgBase64));
+                if (embedingVector != null)
+                {
+                    FaceDbObject faceEmebeding = new FaceDbObject()
+                    {
+                        FaceId = request.FaceId,
+                        EmbededVector = embedingVector
+                    };
+                    bool insertEmbed = await _milvusHelper.InsertPost<FaceDbObject>(faceEmebeding);
+                    if (insertEmbed)
+                    {
+                        return new EmbedingFaceResponse()
+                        {
+                            Code = 1,
+                            Message = "Success"
+                        };
+                    }
+                }
+                return new EmbedingFaceResponse()
+                {
+                    Code = -1,
+                    Message = "Cannot embed face"
+                };
             }
             catch (Exception ex)
             {
@@ -91,7 +117,7 @@ namespace DetectFaceBU
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
-                bool IsVerified = c_FaceDetect.Detect(request.Base64ImgDetect);
+                bool IsVerified = _faceDetectModel.Detect(request.Base64ImgDetect);
                 stopwatch.Stop();
                 DetectFaceResponse response = new DetectFaceResponse()
                 {

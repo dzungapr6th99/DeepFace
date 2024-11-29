@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace MilvusDA.ObjectApi
 {
+    public class InsertRequest<T> where T : class
+    {
+        public string CollectionName { get; set; }
+        public T[] Data { get; set; } 
+
+    }    
     public class InsertResponse
     {
         public int Code { get; set; }

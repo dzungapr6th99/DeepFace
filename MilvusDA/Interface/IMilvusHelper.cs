@@ -9,6 +9,7 @@ namespace MilvusDA.Interface
 {
     public interface IMilvusHelper
     {
+
         void StartManageCollection();
         MilvusCollection? GetOrCreateCollection(string collectionName, int dim, string vectorFieldName, params Tuple<string, Type>[] otherField);
         MilvusCollection? GetCollection(string collectionName);

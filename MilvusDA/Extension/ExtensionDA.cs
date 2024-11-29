@@ -48,13 +48,18 @@ namespace MilvusDA.Extension
             return false;
         }
 
-        public static async Task<bool> InsertPost<T>(IMilvusHelper milvusHelper, T data) where T: class
+        public static async Task<bool> InsertPost<T>(this IMilvusHelper milvusHelper, T data) where T: class
         {
             string collectionName = GetCollectionName(typeof(T));
-            string jsonObjString = JsonConvert.SerializeObject(data, Formatting.Indented, _jsonCamelCaseSetting);
-            string response = await milvusHelper.PostAsync("Insert", jsonObjString, collectionName);
+            InsertRequest<T> request = new InsertRequest<T>()
+            {
+                CollectionName = collectionName,
+                Data = new T[] { data }
+            };
+            string jsonObjString = JsonConvert.SerializeObject(request, Formatting.Indented, _jsonCamelCaseSetting);
+            string response = await milvusHelper.PostAsync("INSERT", jsonObjString, collectionName);
             InsertResponse responseObj = JsonConvert.DeserializeObject<InsertResponse>(response);
-            return responseObj?.Code == 1;
+            return responseObj?.Code == 200;
         }
 
         public static async Task<List<T>> Search<T>(this IMilvusHelper milvusHelper, List<object> data) where T : class

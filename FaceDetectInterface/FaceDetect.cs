@@ -16,6 +16,7 @@ namespace FaceDetectInterface
         public bool Verify(string ImgBase64Db, string ImgBase64Input);
         public void LoadModel();
         bool Detect(string ImgBase64);
+        List<float>? Embeding(string ImgBase64);
     }
 
     public class FaceDetect : IFaceDetect
@@ -82,14 +83,14 @@ namespace FaceDetectInterface
 
         }
 
-        public int Embeding(string ImgBase64)
+        public List<float>? Embeding(string ImgBase64)
         {
             try
             {
                 (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64, width, height);
                 LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
                 if (numFaceDb <= 0)
-                    return -1;
+                    return null;
                 List<byte[]> FacesData = new List<byte[]>();
                 for (int i = 0; i < numFaceDb; i++)
                 {
@@ -102,9 +103,8 @@ namespace FaceDetectInterface
                     NamedOnnxValue.CreateFromTensor(c_InferenceSession.InputNames[0], InputCheck)
                 };
                 var outputTensor = c_InferenceSession.Run(inputs_Check);
-
-                outputTensor[0].AsTensor().To
-                return 1;
+             
+                return TensorToFloatArray(outputTensor[0].AsTensor<float>()).ToList();
 
             }
             catch (Exception ex)

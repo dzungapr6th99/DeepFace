@@ -5,6 +5,9 @@ using DetectFaceBU;
 using DetectFaceObject;
 using FaceDetectInterface;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+using MilvusDA;
+using MilvusDA.Interface;
 using PreProcess;
 
 namespace DeepFace
@@ -13,6 +16,8 @@ namespace DeepFace
     {
         public static void InitProject(IServiceCollection services)
         {
+            services.AddHttpClient();
+            services.AddSingleton<IMilvusHelper, MilvusHelper>();
             services.AddSingleton<IDetectorModel, MtCnnModel>();
             services.AddSingleton<IFaceDetect, FaceDetect>();
             services.AddSingleton<IProcessDetectFaceRequest, ProcessDetectFaceRequest>();

@@ -23,16 +23,23 @@ namespace MilvusDA
         private Thread? _manageCollectionThread;
         private readonly IHttpClientFactory _httpClientFactory;
         private string address;
-      
+
+        public const string INSERT = "INSERT";
+        public const string DELETE = "DELETE";
+        public const string GET = "GET";
+        public const string QUERY = "QUERY";
+        public const string SEARCH = "SEARCH";
+        public const string UPSERT = "UPSERT";
+
         private readonly string _authen;
         private Dictionary<string, string> _dictApiRout = new Dictionary<string, string>()
         {
-            {"Insert", "/v2/vectordb/entities/insert" },
-            {"Delete", "/v2/vectordb/entities/delete" },
-            {"Get", "/v2/vectordb/entities/get" },
-            {"Query", "/v2/vectordb/entities/query" },
-            {"Search", "/v2/vectordb/entities/search" },
-            {"Upsert", "/v2/vectordb/entities/upsert" },
+            {INSERT, "/v2/vectordb/entities/insert" },
+            {DELETE, "/v2/vectordb/entities/delete" },
+            {GET, "/v2/vectordb/entities/get" },
+            {QUERY, "/v2/vectordb/entities/query" },
+            {SEARCH, "/v2/vectordb/entities/search" },
+            {UPSERT, "/v2/vectordb/entities/upsert" },
         };
         /// <summary>
         /// Function create MilvusHelper
@@ -43,10 +50,11 @@ namespace MilvusDA
         /// <param name="isLoadMode">is use load mode? if true, the service will request milvus load collection to improve performance, but the milvus server will consume more resource</param>
         /// <param name="isReleaseCollection">is use mode release collection, if true, when collection is not called after tickPerScanPeriod, it will be released</param>
         /// <param name="tickPerScanPeriod">count by tick</param>
-        public MilvusHelper(string ip = "localhost", int port = 19530, bool useSSL = false, bool isLoadMode = false, bool isReleaseCollection = true, long tickPerScanPeriod = 30 * 60 * TimeSpan.TicksPerSecond, string userName = null, string password = null)
+        public MilvusHelper(IHttpClientFactory httpClient,string ip = "localhost", int port = 19530, bool useSSL = false, bool isLoadMode = false, bool isReleaseCollection = true, long tickPerScanPeriod = 30 * 60 * TimeSpan.TicksPerSecond, string userName = null, string password = null)
         {
+            _httpClientFactory = httpClient;
             // Kết nối đến Milvus
-            address = ip + ":" + port;
+            address = @$"http://{ip}:{port}";
             client = new MilvusClient(ip, port, useSSL);
             loadedCollections = new Dictionary<string, CollectionManagement>();
             _isLoadMode = isLoadMode;
@@ -232,6 +240,7 @@ namespace MilvusDA
                 }
             }
             fieldDatas.Add(FieldSchema.CreateFloatVector(vectorName, dim));
+            
             return fieldDatas.ToArray();
         }
 
@@ -245,10 +254,10 @@ namespace MilvusDA
             }
             using (HttpClient httpClient = _httpClientFactory.CreateClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", _authen);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _authen);
                 StringContent packageContent = new StringContent(jsonObject, Encoding.UTF8, "application/json");
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-                using (HttpResponseMessage response = await httpClient.PostAsync( address + '/' + _dictApiRout[method], packageContent))
+                using (HttpResponseMessage response = await httpClient.PostAsync( address + _dictApiRout[method], packageContent))
                 {
                     string responseString = await response.Content.ReadAsStringAsync();                   
                     return responseString;
