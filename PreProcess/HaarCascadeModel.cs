@@ -4,15 +4,11 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-
+using PreProcess.Interface;
 namespace PreProcess
 {
-    public interface IDetectorModel
-    {
-        public (int, byte[]) Detect(string Base64Image, int width, int height);
-        public void LoadModel();
-    }
-    public unsafe class DetectorModel : IDisposable, IDetectorModel
+    
+    public unsafe class HaarCascadeModel : IDisposable, IDetectorModel
     {
         
         public string c_PathFace;
@@ -33,7 +29,7 @@ namespace PreProcess
         private static extern int DetectImage(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr ListFaceData);
 #endif
         private GCHandle pinedGCHandle;
-        public DetectorModel()
+        public HaarCascadeModel()
         {
             c_PathFace = ConfigData.ModelDetector_Face_Path;
             c_PathEyes = ConfigData.ModelDetector_Eye_Path;

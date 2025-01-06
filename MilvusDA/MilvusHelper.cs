@@ -1,6 +1,6 @@
 ﻿using Milvus.Client;
 using MilvusDA.Interface;
-using Newtonsoft.Json;
+using System.Net.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,6 @@ using System.Text;
 using System.Net.Http.Headers;
 using System.Net;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Serialization;
 namespace MilvusDA
 {
     public class MilvusHelper : IMilvusHelper

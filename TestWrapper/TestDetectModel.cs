@@ -7,7 +7,7 @@ namespace TestWrapper
     [TestClass]
     public class TestDetectModel
     {
-        public DetectorModel detectorModel;
+        public HaarCascadeModel detectorModel;
 
         [TestInitialize]
         public void InitTest()
@@ -20,7 +20,7 @@ namespace TestWrapper
         public void TestCreateModel()
         {
             string PathModel = ConfigData.Cascade_Path;
-            detectorModel = new DetectorModel();
+            detectorModel = new HaarCascadeModel();
             Assert.IsTrue(true);
         }
 
@@ -30,7 +30,7 @@ namespace TestWrapper
         {
             if (detectorModel == null)
             {
-                detectorModel = new DetectorModel();
+                detectorModel = new HaarCascadeModel();
                 detectorModel.LoadModel();
             }
             (int faces, byte[] facesArraydata) = detectorModel.Detect(ImgBase64Input, 224,224);
@@ -43,7 +43,7 @@ namespace TestWrapper
         {
             if (detectorModel == null)
             {
-                detectorModel = new DetectorModel();
+                detectorModel = new HaarCascadeModel();
                 detectorModel.LoadModel();
             }
             FaceDetect faceDetect = new(detectorModel);

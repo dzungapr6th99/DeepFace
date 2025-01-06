@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 using CommonLib;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
+using PreProcess.Interface;
 namespace PreProcess
 {
-    
 
-    public unsafe class MtCnnModel:IDetectorModel
+
+    public unsafe class MtCnnModel : IDetectorModel
     {
         public string MtCnnPath;
         private int height;
@@ -20,7 +21,7 @@ namespace PreProcess
         public static IntPtr DetectModel;
 #if !UNIX
         [DllImport("MtCnnDll.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr CreateMTCnnModel(sbyte * modelPath);
+        private static extern IntPtr CreateMTCnnModel(sbyte* modelPath);
         [DllImport("MtCnnDll.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int DetectFace(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr ListFaceData);
 #else
@@ -79,7 +80,7 @@ namespace PreProcess
             catch
             {
                 throw;
-                
+
             }
         }
         public byte[] GetImgDataArray(int NumFaces, int width, int height, IntPtr dataPointer)
