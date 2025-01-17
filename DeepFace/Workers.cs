@@ -1,7 +1,7 @@
 ﻿using FaceDetectInterface;
 using PreProcess;
 using PreProcess.Interface;
-using FaceDetectInterface.Interface
+using FaceDetectInterface.Interface;
 namespace DeepFace
 {
     public class Workers:BackgroundService
