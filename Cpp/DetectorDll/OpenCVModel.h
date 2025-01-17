@@ -30,7 +30,7 @@ namespace OpenCVClr
 		/// <param name="path"></param>
 		/// <param name="type"></param>
 		OpenCVModel(char* Path, char* Path_Eyes);
-		void Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat> &ListFaces);
+		void Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat> &ListFaces, std::vector<cv::Rect>& objects);
 		cv::Rect* a;
 		vector<cv::Rect> Align_Face(cv::Mat Face);
 		std::string base64_decode(char* base64StringPointer);

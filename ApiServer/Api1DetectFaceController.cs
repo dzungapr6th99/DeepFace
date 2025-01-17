@@ -5,6 +5,7 @@ using System.Diagnostics;
 using CommonLib;
 using FluentValidation;
 using DetectFaceBU;
+using DetectFaceBU.Interface;
 namespace ApiServer
 {
     [Route("detectface")]
@@ -23,7 +24,7 @@ namespace ApiServer
         [Route("api1/verifyface")]
         public async Task<VerifyFaceResponse> Api1DetectFaceProcess(VerifyFaceRequest request)
         {
-            VerifyFaceResponse response = await c_ProcessDetectFaceReq.Api1DetectFaceBU(request);
+            VerifyFaceResponse response = await c_ProcessDetectFaceReq.Api1VerifyFaceBU(request);
             return response;
         }
 
@@ -36,9 +37,10 @@ namespace ApiServer
 
         [HttpPost]
         [Route("api1/detect")]
-        public async Task<DetectFaceResponse> Api2Detect(DetectFaceRequest request)
+        public async Task<DetectFaceResponse> Api3Detect(DetectFaceRequest request)
         {
-
+            var result = c_ProcessDetectFaceReq.Api3DetectFaceBU(request);
+            return new DetectFaceResponse();
         }
     }
 }

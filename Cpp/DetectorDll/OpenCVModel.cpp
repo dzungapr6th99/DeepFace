@@ -33,7 +33,7 @@ namespace OpenCVClr
 		}
 	}
 
-	void OpenCVModel::Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat>& ListFaces)
+	void OpenCVModel::Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat>& ListFaces, std::vector<cv::Rect>& faceCoordinates)
 	{
 		vector<cv::Mat> Detect_Faces;
 		vector<cv::Rect> Eye_Region;
@@ -42,17 +42,16 @@ namespace OpenCVClr
 		vector<uchar> base64data(base64DecodeImg.begin(), base64DecodeImg.end());
 		img = cv::imdecode(base64data, IMREAD_COLOR);
 
-		vector<cv::Rect> objects;
 		cv::Size MaxSize();
 		cv::Size MinSize();
-		Detector->detectMultiScale(img, objects, 1.1, 10); //Detect Face
-		cout << "Detect " << objects.size() << " faces" << endl;
-		for (int i = 0; i < objects.size(); i++)
+		Detector->detectMultiScale(img, faceCoordinates, 1.1, 10); //Detect Face
+		cout << "Detect " << faceCoordinates.size() << " faces" << endl;
+		for (int i = 0; i < faceCoordinates.size(); i++)
 		{
 			cv::Mat Eye;
 			vector<cv::Rect> detectFaceRect;
-			std::cout << "Face " << i << "th is locate at x: " << objects[i].x << " y: " << objects[i].y << " w: " << objects[i].width << " h: " << objects[i].height<< '\n';
-			cv::Mat Face = img(cv::Range(objects[i].y, objects[i].y + objects[i].height), cv::Range(objects[i].x, objects[i].x + objects[i].width)); // Crop Image
+			std::cout << "Face " << i << "th is locate at x: " << faceCoordinates[i].x << " y: " << faceCoordinates[i].y << " w: " << faceCoordinates[i].width << " h: " << faceCoordinates[i].height<< '\n';
+			cv::Mat Face = img(cv::Range(faceCoordinates[i].y, faceCoordinates[i].y + faceCoordinates[i].height), cv::Range(faceCoordinates[i].x, faceCoordinates[i].x + faceCoordinates[i].width)); // Crop Image
 			ListFaces.push_back(Face);
 			if (Align)
 			{
@@ -176,22 +175,25 @@ void* CreateModel(char* path, char* path_Eyes)
 	return new OpenCVClr::OpenCVModel(path, path_Eyes);
 }
 
-int DetectImage(void* model, char* base64Image, int length, int width, int height, void*& ListImage)
+int DetectImage(void* model, char* base64Image, int length, int width, int height, void*& listFaces, void*& listCoordinate)
 {
 	OpenCVClr::OpenCVModel* model1 = (OpenCVClr::OpenCVModel*)model;
 	std::vector<int> EyesCoordinate;
 	std::vector<cv::Mat>Faces = { };
-	model1->Detect(base64Image, length, false, EyesCoordinate, Faces);
+	std::vector<cv::Rect> faceCoordinates;
+	model1->Detect(base64Image, length, false, EyesCoordinate, Faces, faceCoordinates);
 	/*if (Faces.size() == 0)
 		return 0;*/
-	ListImage = new unsigned char[Faces.size() * width * height * 3];
+	listFaces = new unsigned char[Faces.size() * width * height * 3];
+	listCoordinate = new int[Faces.size() * 4];
 	int index = 0;
 	for (int i = 0; i < Faces.size(); i++)
 	{
 		cv::Mat ResizeFace;
 		cv::resize(Faces[i], ResizeFace, cv::Size(width, height));
-
-		_memccpy(ListImage, ResizeFace.data, i, width * height * 3);
+		int* coordinate = new int[4]{ faceCoordinates[i].x, faceCoordinates[i].y, faceCoordinates[i].width, faceCoordinates[i].height };
+		_memccpy(listCoordinate, coordinate, i*4, 4);
+		_memccpy(listFaces, ResizeFace.data, i, width * height * 3);
 		i += width * height * 3;
 
 	}

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MilvusDA;
 using MilvusDA.Interface;
 using PreProcess;
+using PreProcess.Interface;
 
 namespace DeepFace
 {

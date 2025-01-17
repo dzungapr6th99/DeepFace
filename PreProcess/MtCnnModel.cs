@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using CommonLib;
-using Microsoft.ML.OnnxRuntime;
-using Microsoft.ML.OnnxRuntime.Tensors;
 using PreProcess.Interface;
 namespace PreProcess
 {
 
 
-    public unsafe class MtCnnModel : IDetectorModel
+    public unsafe class MtCnnModel : DetectModelExtension, IDetectorModel, IDisposable
     {
         public string MtCnnPath;
         private int height;
@@ -23,12 +22,12 @@ namespace PreProcess
         [DllImport("MtCnnDll.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr CreateMTCnnModel(sbyte* modelPath);
         [DllImport("MtCnnDll.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int DetectFace(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr ListFaceData);
+        private static extern int DetectFace(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr listFaceData, out IntPtr listFaceCoordinates);
 #else
         [DllImport("libMtCnnModel.so", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr CreateMTCnnModel(sbyte * modelPath);
         [DllImport("libMtCnnModel.so", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int DetectFace(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr ListFaceData);
+        private static extern int DetectFace(IntPtr model, sbyte* Base64Img, int length, int width, int height, out IntPtr listFaceData, out IntPtr listFaceCoordinates);
 #endif
         private GCHandle pinedGCHandle;
         public MtCnnModel()
@@ -51,31 +50,33 @@ namespace PreProcess
                 IsloadedModel = true;
             }
         }
-        public (int, byte[]) Detect(string Base64Image, int width, int height)
+        public (int, byte[]) Detect(string Base64Image, int width, int height, out List<Rectangle>? faceCoordinates)
         {
             try
             {
-
                 IntPtr ListFaceData;
                 byte[] base64ImgRaw = Encoding.UTF8.GetBytes(Base64Image);
                 sbyte* dataImg = (sbyte*)GCHandle.Alloc(base64ImgRaw, GCHandleType.Pinned).AddrOfPinnedObject().ToPointer();
                 Marshal.Copy(base64ImgRaw, 0, (IntPtr)(dataImg + 0), Base64Image.Length);
 
-                int NumFaces = DetectFace(DetectModel, dataImg, Base64Image.Length, width, height, out ListFaceData);
+                int NumFaces = DetectFace(DetectModel, dataImg, Base64Image.Length, width, height, out ListFaceData, out IntPtr listFaceCoordinate);
                 if (NumFaces > 0)
                 {
                     //Tức là detect ra có.     
+                    faceCoordinates = GetFaceCoordinates(NumFaces, listFaceCoordinate);
                     return (NumFaces, GetImgDataArray(NumFaces, width, height, ListFaceData));
                 }
                 else
                 {
+                    faceCoordinates = null;
                     return (0, null);
                 }
             }
             catch (Exception ex)
             {
                 LOG.log.Error(ex);
-                throw;
+                faceCoordinates = null;
+                return (0, null);
             }
             catch
             {
@@ -83,16 +84,6 @@ namespace PreProcess
 
             }
         }
-        public byte[] GetImgDataArray(int NumFaces, int width, int height, IntPtr dataPointer)
-        {
-
-            GCHandle pinedGCHandle = GCHandle.Alloc(dataPointer, GCHandleType.Pinned);
-            Span<byte> byteSpan = new Span<byte>(dataPointer.ToPointer(), NumFaces * width * height * 3);
-            byte[] returnData = byteSpan.ToArray();
-            pinedGCHandle.Free();
-            return returnData;
-        }
-
         public void Dispose()
         {
 

@@ -58,10 +58,16 @@ namespace MilvusDA.Extension
             };
             string jsonObjString = JsonConvert.SerializeObject(request, Formatting.Indented, _jsonCamelCaseSetting);
             string response = await milvusHelper.PostAsync("INSERT", jsonObjString, collectionName);
-            InsertResponse responseObj = JsonConvert.DeserializeObject<InsertResponse>(response);
+            InsertResponse? responseObj = JsonConvert.DeserializeObject<InsertResponse>(response);
             return responseObj?.Code == 200;
         }
-
+        /// <summary>
+        /// Function get the data from vector database
+        /// </summary>
+        /// <typeparam name="T">class object mapping with object in vector Database</typeparam>
+        /// <param name="milvusHelper"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static async Task<List<T>> Search<T>(this IMilvusHelper milvusHelper, List<object> data) where T : class
         {
             string collectionName = GetCollectionName(typeof(T));

@@ -8,13 +8,13 @@ namespace VectorDbObj.CustomAttribute
 {
     public class CollectionAttribute : Attribute
     {
-        public string CollectionName { get; set; }  
+        public string? CollectionName { get; set; }  
         
     }
 
     public class FieldSchemaAttribute : Attribute
     {
-        public string FieldName { get; set; }
+        public string? FieldName { get; set; }
         public bool IsVector { get; set; } = false;
         
     }

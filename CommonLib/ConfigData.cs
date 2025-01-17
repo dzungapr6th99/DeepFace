@@ -25,8 +25,8 @@ namespace CommonLib
 
     public class ModelInfo
     {
-        public string Name { get; set; }
-        public Threshold Threshold { get; set; }
+        public string? Name { get; set; }
+        public Threshold? Threshold { get; set; }
         public int Dim { get; set; }
     }
 
@@ -34,17 +34,17 @@ namespace CommonLib
     public class ConfigData
     {
         public static char SOH;
-        public static string Cascade_Path; 
+        public static string Cascade_Path = string.Empty; 
         public static List<string> ListPreModel = new List<string>();
         public static Dictionary<string, string> ListPreModelPath = new Dictionary<string, string>();
-        public static string ModelDetector_Face_Path;
-        public static string ModelDetector_Eye_Path;
-        public static string ModelVerifyPath;
-        public static string ModelPath;
+        public static string ModelDetector_Face_Path = string.Empty;
+        public static string ModelDetector_Eye_Path = string.Empty;
+        public static string ModelVerifyPath = string.Empty;
+        public static string ModelPath = string.Empty;
         public static bool IsRunOnGpu = false;
         public static Dictionary<string, Dictionary<string, float>> DictThreshold;
         public static Dictionary<string, ModelInfo> DictModelInfo;
-        public static string MtCnnPath;
+        public static string MtCnnPath = string.Empty;
         public static double Threshold;
         public static void InitConfigData(IConfigurationRoot configurationRoot)
         {
@@ -54,7 +54,7 @@ namespace CommonLib
             ModelDetector_Face_Path = Path.Combine(ModelPath, configurationRoot["ModelFaceDetector"]?.ToString());
             ModelDetector_Eye_Path = Path.Combine(ModelPath, configurationRoot["ModelEyesDetector"]?.ToString());
             MtCnnPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + configurationRoot["MtCnnPath"]?.ToString() + Path.DirectorySeparatorChar;
-            ModelVerifyPath = Path.Combine(ModelPath, configurationRoot["ModelVerifyFace"]?.ToString());
+            ModelVerifyPath = Path.Combine(ModelPath, configurationRoot["ModelVerifyFace"]?.ToString() ?? string.Empty);
             DictThreshold = configurationRoot.GetSection("Threshold").Get<Dictionary<string, Dictionary<string, float>>>();
             string configRunOnGpu = configurationRoot["UseGpu"]?.ToString();
             IsRunOnGpu = (runOnGpu != null && runOnGpu == "true")? true : false;

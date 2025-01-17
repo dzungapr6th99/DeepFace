@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -23,6 +24,11 @@ namespace DetectFaceObject
         public bool Detected { get; set; } = false;
         public string ReturnMessage { get; set; } = string.Empty;
         public int ReturnCode { get; set; }
-        public DetectFaceResponse() { }
+        public List<Rectangle>? facesCoordinates { get; set; }
+        public List<string>? faceNames { get; set; }
+        public DetectFaceResponse() 
+        {
+
+        }
     }
 }

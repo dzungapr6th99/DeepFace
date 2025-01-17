@@ -12,23 +12,23 @@ namespace MilvusDA.ObjectApi
         /// <summary>
         /// The name of the database.
         /// </summary>
-        public string DbName { get;set; }
+        public string? DbName { get;set; }
         /// <summary>
         /// The name of the collection to which this operation applies.
         /// </summary>
-        public string CollectionName { get;set; }
+        public string? CollectionName { get;set; }
         /// <summary>
         /// A list of vector embeddings. Milvus searches for the most similar vector embeddings to the specified ones.
         /// </summary>
-        public List<object> Data { get; set; }
+        public List<object>? Data { get; set; }
         /// <summary>
         /// The name of the vector field.
         /// </summary>
-        public string AnnsField { get; set; }
+        public string? AnnsField { get; set; }
         /// <summary>
         /// The filter used to find matches for the search.
         /// </summary>
-        public string Filter { get; set; }
+        public string? Filter { get; set; }
         /// <summary>
         /// The total number of entities to return. You can use this parameter in combination with offset in param to enable pagination. 
         /// The sum of this value and offset in param should be less than 16,384. 
@@ -42,13 +42,13 @@ namespace MilvusDA.ObjectApi
         /// <summary>
         /// The name of the field that serves as the aggregation criteria.
         /// </summary>
-        public string GroupingField { get; set; }
+        public string? GroupingField { get; set; }
         /// <summary>
         /// An array of fields to return along with the search results.
         /// </summary>
-        public List<string> OutputFields { get; set; }
-        public SearchParameter SearchParams { get; set; }   
-        public List<string> PartitionNames { get; set; }
+        public List<string>? OutputFields { get; set; }
+        public SearchParameter? SearchParams { get; set; }   
+        public List<string>? PartitionNames { get; set; }
        
     }
     /// <summary>
@@ -57,7 +57,7 @@ namespace MilvusDA.ObjectApi
     public class SearchParameter
     {
         public MertricType MertricType { get; set; }
-        public Param Params { get;set; }
+        public Param? Params { get;set; }
     }
 
     public enum MertricType
@@ -90,8 +90,8 @@ namespace MilvusDA.ObjectApi
     public class SearchResponse<T> where T : class
     {
         public int Code { get; set; }   
-        public string Message { get; set; }
-        public List<T> Data { get; set; }
+        public string? Message { get; set; }
+        public List<T>? Data { get; set; }
 
     }
     /// <summary>
@@ -100,7 +100,7 @@ namespace MilvusDA.ObjectApi
     public class SearchResponse
     {
         public int Code { get; set; }
-        public string Message { get; set; }
+        public string? Message { get; set; }
         public List<Dictionary<string, object>> Data { get; set; }
     }
 }
