@@ -24,6 +24,6 @@ public:
 extern "C"
 {
     CPPEXPORT void* CreateMTCnnModel(char* path);
-    CPPEXPORT int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& ListImage);
+    CPPEXPORT int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& listImage, void*& facesCoordinates);
 }
 #endif

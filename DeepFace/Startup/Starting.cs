@@ -2,8 +2,10 @@
 using ApiServer.Validation;
 using CommonLib;
 using DetectFaceBU;
+using DetectFaceBU.Interface;
 using DetectFaceObject;
 using FaceDetectInterface;
+using FaceDetectInterface.Interface;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using MilvusDA;

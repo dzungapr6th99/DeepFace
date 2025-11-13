@@ -31,11 +31,11 @@ namespace DetectFaceBU
             {
 
                 LOG.log.Info("Start Process request {0}", request.RequestID);
-                LOG.log.Debug("Image check: {0}", request.Base64ImgCheck);
-                LOG.log.Debug("Image verify: {0}", request.Base64ImgVerify);
+                LOG.log.Debug("Image check: {0}", request.ImageCheck);
+                LOG.log.Debug("Image verify: {0}", request.ImageVerify);
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
-                bool IsVerified = _faceDetectModel.Verify(request.Base64ImgVerify, request.Base64ImgCheck);
+                bool IsVerified = _faceDetectModel.Verify(request.ImageVerify, request.ImageCheck);
                 stopwatch.Stop();
                 VerifyFaceResponse response = new VerifyFaceResponse()
                 {
@@ -73,7 +73,7 @@ namespace DetectFaceBU
         {
             try
             {
-                List<List<float>>? embedingVectors = await Task.Run(()=> _faceDetectModel.Embeding(request.ImgBase64, out var faceCoordinates));
+                List<List<float>>? embedingVectors = await Task.Run(()=> _faceDetectModel.Embeding(request.ImageBase, out var faceCoordinates));
                 if (embedingVectors != null)
                 {
                     if (embedingVectors.Count == 1)
@@ -134,7 +134,7 @@ namespace DetectFaceBU
             try
             {
                 List<Rectangle> faceCoordinates;
-                List<List<float>>? embedingVectors = _faceDetectModel.Embeding(request.Base64ImgDetect, out faceCoordinates);
+                List<List<float>>? embedingVectors = _faceDetectModel.Embeding(request.ImageDetect, out faceCoordinates);
 
 
                 if (embedingVectors != null && embedingVectors.Count > 0)
@@ -186,7 +186,7 @@ namespace DetectFaceBU
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
-                bool IsVerified = _faceDetectModel.Detect(request.Base64ImgDetect);
+                bool IsVerified = _faceDetectModel.Detect(request.ImageDetect);
                 stopwatch.Stop();
                 DetectFaceResponse response = new DetectFaceResponse()
                 {

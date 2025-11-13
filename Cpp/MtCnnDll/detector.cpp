@@ -160,7 +160,7 @@ void* CreateMTCnnModel(char* path)
 }
 
 
-int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& ListImage)
+int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& listImage, void*& facesCoordinates)
 {
 	try
 	{
@@ -170,14 +170,17 @@ int DetectFace(void* model, char* base64Image, int length, int width, int height
 		std::vector<uchar> base64data(base64DecodeImg.begin(), base64DecodeImg.end());
 		cv::Mat img = cv::imdecode(base64data, cv::ImreadModes::IMREAD_COLOR);
 		std::vector<Face> faces = detector->detect(img, 20.f, 0.709f);
-		ListImage = new char[faces.size() * 3 * width * height];
+		listImage = new char[faces.size() * 3 * width * height];
+		facesCoordinates = new int[faces.size() * 4];
 		for (int i = 0; i < faces.size(); i++)
 		{
 			cv::Mat ResizeFace;
 			cv::Mat face = img(faces[i].bbox.getRect());
+			int* coordinate = new int[4] { (int)faces[i].bbox.x1, (int)faces[i].bbox.y1, (int)faces[i].bbox.x2 - (int)faces[i].bbox.x1, (int)faces[i].bbox.y2 - (int)faces[i].bbox.y1};
+			_memccpy(facesCoordinates, coordinate, i * 4, 4);
 			cv::resize(face, ResizeFace, cv::Size(width, height));
 
-			_memccpy(ListImage, ResizeFace.data, i, width * height * 3);
+			_memccpy(listImage, ResizeFace.data, i, width * height * 3);
 			i += width * height * 3;
 		}
 		return faces.size();

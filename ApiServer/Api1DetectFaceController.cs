@@ -30,7 +30,7 @@ namespace ApiServer
 
         [HttpPost]
         [Route("api1/embeding")]
-        public async Task<EmbedingFaceResponse> Api2Embeding(EmbedingFaceRequest request)
+        public async Task<EmbedingFaceResponse> Api2Embeding([FromForm] EmbedingFaceRequest request)
         {
             return await c_ProcessDetectFaceReq.Api2EmbedingFaceBU(request);
         }

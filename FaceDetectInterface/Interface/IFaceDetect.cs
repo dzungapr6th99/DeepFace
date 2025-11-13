@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace FaceDetectInterface.Interface
 {
     public interface IFaceDetect
     {
-        public bool Verify(string ImgBase64Db, string ImgBase64Input);
+        public bool Verify(IFormFile ImageCheck, IFormFile ImageVerify);
         public void LoadModel();
-        bool Detect(string ImgBase64);
-        List<List<float>>? Embeding(string ImgBase64, out List<Rectangle> faceCoordinates);
+        bool Detect(IFormFile ImgBase);
+        List<List<float>>? Embeding(IFormFile ImageEmbed, out List<Rectangle> faceCoordinates);
     }
 }

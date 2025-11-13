@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System;
 using PreProcess.Interface;
 using FaceDetectInterface.Interface;
+using Microsoft.AspNetCore.Http;
 namespace FaceDetectInterface
 {
 
@@ -60,11 +61,12 @@ namespace FaceDetectInterface
             IsLoadModel = true;
         }
 
-        public bool Detect(string ImgBase64)
+        public bool Detect(IFormFile ImageBase)
         {
             try
             {
-                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64, width, height, out List<Rectangle> faceCoordinate);
+                byte[] ImageBaseByte = GetBytesFromFile(ImageBase);
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImageBaseByte, width, height, out List<Rectangle> faceCoordinate);
                 if (numFaceDb >= 0)
                     return true;
                 else
@@ -79,13 +81,14 @@ namespace FaceDetectInterface
 
         }
 
-        public List<List<float>>? Embeding(string ImgBase64, out List<Rectangle> faceCoordinates)
+        public List<List<float>>? Embeding(IFormFile ImageEmbeding, out List<Rectangle> faceCoordinates)
         {
             try
             {
                 faceCoordinates = new List<Rectangle>();
                 List<List<float>> dataEmbeding = new List<List<float>>();
-                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64, width, height, out faceCoordinates);
+                byte[] ImageEmbedingBytes = GetBytesFromFile(ImageEmbeding);
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImageEmbedingBytes, width, height, out faceCoordinates);
 
                 LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
                 if (numFaceDb <= 0)
@@ -113,14 +116,18 @@ namespace FaceDetectInterface
             }
         }
 
-        public bool Verify(string ImgBase64Db, string ImgBase64Input)
+        public bool Verify(IFormFile ImageCheck, IFormFile ImageVerify)
         {
             try
             {
-                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImgBase64Db, width, height, out List<Rectangle> faceInputCoordinate);
-                LOG.log.Info("ImgBaseDb detected {0} faces", numFaceDb);
-                (int numFaceInput, byte[] DataInput) = c_DetectorModel.Detect(ImgBase64Input, width, height, out List<Rectangle> faceOutputCoordinates);
-                LOG.log.Info("ImgBaseInput detected {0} faces", numFaceInput);
+                byte[] ImageCheckBytes = GetBytesFromFile(ImageCheck);
+                (int numFaceDb, byte[] DataDb) = c_DetectorModel.Detect(ImageCheckBytes, width, height, out List<Rectangle> faceInputCoordinate);
+                LOG.log.Info("Image Check detected {0} faces", numFaceDb);
+
+
+                byte[] ImageVerifyBytes = GetBytesFromFile(ImageCheck);
+                (int numFaceInput, byte[] DataInput) = c_DetectorModel.Detect(ImageVerifyBytes, width, height, out List<Rectangle> faceOutputCoordinates);
+                LOG.log.Info("Image Verify detected {0} faces", numFaceInput);
                 List<byte[]> FacesData = new List<byte[]>();
                 for (int i = 0; i < numFaceDb; i++)
                 {
@@ -226,6 +233,17 @@ namespace FaceDetectInterface
             }
 
             return floatList;
+        }
+
+        private byte[] GetBytesFromFile(IFormFile file)
+        {
+            byte[] encodedBytes;
+            using (var ms = new MemoryStream())
+            {
+                file.CopyTo(ms);
+                encodedBytes = ms.ToArray();
+            }
+            return encodedBytes;
         }
 
         public float[] TensorToFloatArray(Tensor<float> tensor)

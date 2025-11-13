@@ -56,17 +56,16 @@ namespace PreProcess
                 IsloadedModel = true;
             }
         }
-        public (int, byte[]) Detect(string Base64Image, int width, int height, out List<Rectangle>? faceCoordinates)
+        public (int, byte[]) Detect(byte[] base64ImgRaw, int width, int height, out List<Rectangle>? faceCoordinates)
         {
             try
             {
                 IntPtr listFaceData;
                 IntPtr listFaceCoordinate;
-                byte[] base64ImgRaw = Encoding.UTF8.GetBytes(Base64Image);
                 sbyte* dataImg = (sbyte*)GCHandle.Alloc(base64ImgRaw, GCHandleType.Pinned).AddrOfPinnedObject().ToPointer();
-                Marshal.Copy(base64ImgRaw, 0, (IntPtr)(dataImg + 0), Base64Image.Length);
+                Marshal.Copy(base64ImgRaw, 0, (IntPtr)(dataImg + 0), base64ImgRaw.Length);
 
-                int NumFaces = DetectImage(DetectModel, dataImg, Base64Image.Length, width, height, out listFaceData, out listFaceCoordinate);
+                int NumFaces = DetectImage(DetectModel, dataImg, base64ImgRaw.Length, width, height, out listFaceData, out listFaceCoordinate);
                 if (NumFaces > 0)
                 {
                     //Tức là detect ra có.     

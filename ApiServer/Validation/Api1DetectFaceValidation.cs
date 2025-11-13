@@ -14,24 +14,24 @@ namespace ApiServer.Validation
         {
             ClassLevelCascadeMode = CascadeMode.Stop;
             RuleLevelCascadeMode = CascadeMode.Stop;
-            RuleFor(x => x.Base64ImgVerify).Must((s, checkBase64ImgVerify) =>
+            RuleFor(x => x.ImageVerify).Must((s, checkBase64ImgVerify) =>
             {
-                if (string.IsNullOrWhiteSpace(checkBase64ImgVerify))
+                if (checkBase64ImgVerify == null | checkBase64ImgVerify.Length == 0)
                     return false;
                 else return true;
-            }).WithMessage("'Base64ImgVerify' is not null").WithName("Base64ImgVerify").WithErrorCode("-001");
-            RuleFor(x => x.Base64ImgCheck).Must((s, Base64ImgCheck) =>
+            }).WithMessage("'ImageVerify' is not null").WithName("ImageVerify").WithErrorCode("-001");
+            RuleFor(x => x.ImageCheck).Must((s, Base64ImgCheck) =>
           {
-              if (string.IsNullOrWhiteSpace(Base64ImgCheck))
+              if (Base64ImgCheck == null || Base64ImgCheck.Length == 0)
                   return false;
               else return true;
-          }).WithMessage("'Base64ImgVerify' is not null").WithName("Base64ImgVerify").WithErrorCode("-001");
+          }).WithMessage("'ImageCheck' is not null").WithName("ImageCheck").WithErrorCode("-001");
             RuleFor(x => x.RequestID).Must((s, RequestID) =>
           {
               if (string.IsNullOrWhiteSpace(RequestID))
                   return false;
               else return true;
-          }).WithMessage("'Base64ImgVerify' is not null").WithName("Base64ImgVerify").WithErrorCode("-001");
+          }).WithMessage("'RequestID' is not null").WithName("RequestID").WithErrorCode("-001");
 
         }
     }

@@ -9,7 +9,7 @@ namespace PreProcess.Interface
 {
     public interface IDetectorModel
     {
-        public (int, byte[]) Detect(string Base64Image, int width, int height, out List<Rectangle>? faceCoordinates);
+        public (int, byte[]) Detect(byte[] Base64Image, int width, int height, out List<Rectangle>? faceCoordinates);
         public void LoadModel();
     }
 }
