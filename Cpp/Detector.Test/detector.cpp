@@ -155,7 +155,7 @@ std::string base64_decode(char* base64StringPointer)
 
 	return ret;
 }
-int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& ListImage)
+int DetectFaceFromBase64(void* model, char* base64Image, int length, int width, int height, void*& ListImage)
 {
     MTCNNDetector* detector = (MTCNNDetector*)model;
 	std::string base64DecodeImg = base64_decode(base64Image);

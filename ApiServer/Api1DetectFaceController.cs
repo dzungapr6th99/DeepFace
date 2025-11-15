@@ -6,6 +6,7 @@ using CommonLib;
 using FluentValidation;
 using DetectFaceBU;
 using DetectFaceBU.Interface;
+using Microsoft.AspNetCore.Mvc.Formatters.Internal;
 namespace ApiServer
 {
     [Route("detectface")]
@@ -22,7 +23,7 @@ namespace ApiServer
         }
         [HttpPost]
         [Route("api1/verifyface")]
-        public async Task<VerifyFaceResponse> Api1DetectFaceProcess(VerifyFaceRequest request)
+        public async Task<VerifyFaceResponse> Api1DetectFaceProcess([FromForm] VerifyFaceRequest request)
         {
             VerifyFaceResponse response = await c_ProcessDetectFaceReq.Api1VerifyFaceBU(request);
             return response;
@@ -37,10 +38,23 @@ namespace ApiServer
 
         [HttpPost]
         [Route("api1/detect")]
-        public async Task<DetectFaceResponse> Api3Detect(DetectFaceRequest request)
+        public async Task<DetectFaceResponse> Api3Detect([FromForm] DetectFaceRequest request)
         {
-            var result = c_ProcessDetectFaceReq.Api3DetectFaceBU(request);
-            return new DetectFaceResponse();
+            var result = await c_ProcessDetectFaceReq.Api3DetectFaceBU(request);
+            if (result != null)
+            {
+                return result;
+
+            }
+            else
+            {
+                return new DetectFaceResponse()
+                {
+                    Detected = false,
+                    ReturnCode = -1,
+                    ReturnMessage = "Cannot find face in database"
+                };
+            }
         }
     }
 }

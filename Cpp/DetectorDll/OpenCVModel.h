@@ -30,18 +30,21 @@ namespace OpenCVClr
 		/// <param name="path"></param>
 		/// <param name="type"></param>
 		OpenCVModel(char* Path, char* Path_Eyes);
-		void Detect(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat> &ListFaces, std::vector<cv::Rect>& objects);
+		void DetectFromBase64(char* Base64Array, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat>& ListFaces, std::vector<cv::Rect>& objects);
+		void Detect(const unsigned char* Data, int Length, bool Align, std::vector<int> EyeCoordinate, std::vector<cv::Mat>& ListFaces, std::vector<cv::Rect>& objects);
 		cv::Rect* a;
 		vector<cv::Rect> Align_Face(cv::Mat Face);
 		std::string base64_decode(char* base64StringPointer);
 
 	};
-	
+
 }
 EXTERN_C
 {
 	CPPEXPORT void* CreateModel(char* path, char* path_eyes);
-	CPPEXPORT int DetectImage(void* model, char* base64Image, int length, int width, int height, void*& Data);
+	CPPEXPORT int DetectImage(void* model, unsigned char* data, int length, int width, int height, void*& listFaces, void*& listCoordinate);
+	CPPEXPORT int DetectImageFromBase64(void* model, char* base64Image, int length, int width, int height, void*& listFaces, void*& listCoordinate);
 
 };
+
 

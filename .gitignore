@@ -781,3 +781,5 @@ packages
 **/obj
 **/packages
 MilvusDA/MilvusHelper.cs
+/PreProcess/DetectorDll.dll
+/PreProcess/DetectorDll.dll

@@ -2,16 +2,19 @@
 using PreProcess;
 using PreProcess.Interface;
 using FaceDetectInterface.Interface;
+using MilvusDA.Interface;
 namespace DeepFace
 {
     public class Workers:BackgroundService
     {
-        private IDetectorModel c_DetectorModel;
-        private IFaceDetect c_FaceDetect;
-        public Workers(IDetectorModel p_DetectorModel,  IFaceDetect p_FaceDetect)
+        private IDetectorModel _detectorModel;
+        private IFaceDetect _faceDetect;
+        private IMilvusHelper _milvusHelper;
+        public Workers(IDetectorModel p_DetectorModel,  IFaceDetect p_FaceDetect, IMilvusHelper milvusHelper)
         {
-            c_DetectorModel = p_DetectorModel;
-            c_FaceDetect = p_FaceDetect;
+            _detectorModel = p_DetectorModel;
+            _faceDetect = p_FaceDetect;
+            _milvusHelper = milvusHelper;
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
@@ -21,8 +24,9 @@ namespace DeepFace
 
         protected override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            c_DetectorModel.LoadModel();
-            c_FaceDetect.LoadModel();
+            _detectorModel.LoadModel();
+            _faceDetect.LoadModel();
+            _milvusHelper.StartManageCollection();
             return  Task.CompletedTask;
         }
         public override Task StopAsync(CancellationToken cancellationToken)

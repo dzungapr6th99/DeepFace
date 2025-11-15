@@ -49,7 +49,7 @@ namespace MilvusDA
         /// <param name="isLoadMode">is use load mode? if true, the service will request milvus load collection to improve performance, but the milvus server will consume more resource</param>
         /// <param name="isReleaseCollection">is use mode release collection, if true, when collection is not called after tickPerScanPeriod, it will be released</param>
         /// <param name="tickPerScanPeriod">count by tick</param>
-        public MilvusHelper(IHttpClientFactory httpClient,string ip = "localhost", int port = 19530, bool useSSL = false, bool isLoadMode = false, bool isReleaseCollection = true, long tickPerScanPeriod = 30 * 60 * TimeSpan.TicksPerSecond, string userName = null, string password = null)
+        public MilvusHelper(IHttpClientFactory httpClient,string ip = "localhost", int port = 19530, bool useSSL = false, bool isLoadMode = true, bool isReleaseCollection = true, long tickPerScanPeriod = 30 * 60 * TimeSpan.TicksPerSecond, string userName = null, string password = null)
         {
             _httpClientFactory = httpClient;
             // Kết nối đến Milvus
@@ -80,13 +80,14 @@ namespace MilvusDA
                         var released = manageCollection.ReleaseCollection();
                     }
                 }
+                Thread.Sleep(1000);
             }
         }
 
         public virtual MilvusCollection? GetOrCreateCollection(string collectionName, int dim, string vectorFieldName, params Tuple<string, Type>[] otherField)
         {
             /*
-            Ở đâu thiết kế vector db đơn giản là mỗi collection (collection trong vector db thì tương ứng với bảng trong sql db)
+            Ở đây thiết kế vector db đơn giản là mỗi collection (collection trong vector db thì tương ứng với bảng trong sql db)
             tương ứng cho 1 loại model (do mỗi model thì có đầu ra là ma trận vector có số chiều khác nhau). 1 collection hay bảng thì 
             có 2 field (field tương ứng với cột trong sql db), 1 cột là id, cột còn lại là thông tin vector
              */

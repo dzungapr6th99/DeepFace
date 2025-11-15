@@ -24,6 +24,6 @@ public:
 extern "C"
 {
     void* CreateMTCnnModel();
-    int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& ListImage);
+    int DetectFaceFromBase64(void* model, char* base64Image, int length, int width, int height, void*& ListImage);
 }
 #endif

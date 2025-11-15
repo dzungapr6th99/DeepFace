@@ -40,8 +40,8 @@ namespace FaceDetectInterface
         }
         public void LoadModel()
         {
-            width = 160;
-            height = 160;
+            width = 224;
+            height = 224;
             if (!IsLoadModel)
             {
                 if (ConfigData.IsRunOnGpu)

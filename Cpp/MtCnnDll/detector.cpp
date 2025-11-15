@@ -160,7 +160,7 @@ void* CreateMTCnnModel(char* path)
 }
 
 
-int DetectFace(void* model, char* base64Image, int length, int width, int height, void*& listImage, void*& facesCoordinates)
+int DetectFaceFromBase64(void* model, char* base64Image, int length, int width, int height, void*& listImage, void*& facesCoordinates)
 {
 	try
 	{
@@ -188,6 +188,41 @@ int DetectFace(void* model, char* base64Image, int length, int width, int height
 	catch (cv::Exception cvEx)
 	{
 		std::cout << "Caught cv Exception: " << cvEx.msg<< "\n";
+		return 0;
+	}
+	catch (std::exception ex)
+	{
+		std::cout << "Caught std exception: " << ex.what() << "\n";
+		return 0;
+	}
+}
+int DetectFace(void* model, unsigned char* data, int length, int width, int height, void*& listImage, void*& facesCoordinates)
+{
+	try
+	{
+
+		MTCNNDetector* detector = (MTCNNDetector*)model;
+		std::vector<uchar> buffer(data, data + length);
+		cv::Mat img = cv::imdecode(buffer, cv::ImreadModes::IMREAD_COLOR);
+		std::vector<Face> faces = detector->detect(img, 20.f, 0.709f);
+		listImage = new char[faces.size() * 3 * width * height];
+		facesCoordinates = new int[faces.size() * 4];
+		for (int i = 0; i < faces.size(); i++)
+		{
+			cv::Mat ResizeFace;
+			cv::Mat face = img(faces[i].bbox.getRect());
+			int* coordinate = new int[4] { (int)faces[i].bbox.x1, (int)faces[i].bbox.y1, (int)faces[i].bbox.x2 - (int)faces[i].bbox.x1, (int)faces[i].bbox.y2 - (int)faces[i].bbox.y1};
+			_memccpy(facesCoordinates, coordinate, i * 4, 4);
+			cv::resize(face, ResizeFace, cv::Size(width, height));
+
+			_memccpy(listImage, ResizeFace.data, i, width * height * 3);
+			i += width * height * 3;
+		}
+		return faces.size();
+	}
+	catch (cv::Exception cvEx)
+	{
+		std::cout << "Caught cv Exception: " << cvEx.msg << "\n";
 		return 0;
 	}
 	catch (std::exception ex)

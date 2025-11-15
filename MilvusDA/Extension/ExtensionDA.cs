@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Milvus.Client;
+using MilvusDA.Common;
 using MilvusDA.CustomAttributes;
 using MilvusDA.Interface;
 using MilvusDA.ObjectApi;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MilvusDA.Extension
 {
@@ -48,7 +50,7 @@ namespace MilvusDA.Extension
             return false;
         }
 
-        public static async Task<bool> InsertPost<T>(this IMilvusHelper milvusHelper, T data) where T: class
+        public static async Task<bool> InsertPost<T>(this IMilvusHelper milvusHelper, T data) where T : class
         {
             string collectionName = GetCollectionName(typeof(T));
             InsertRequest<T> request = new InsertRequest<T>()
@@ -57,7 +59,7 @@ namespace MilvusDA.Extension
                 Data = new T[] { data }
             };
             string jsonObjString = JsonConvert.SerializeObject(request, Formatting.Indented, _jsonCamelCaseSetting);
-            string response = await milvusHelper.PostAsync("INSERT", jsonObjString, collectionName);
+            string response = await milvusHelper.PostAsync(EnumData.CommandType.Insert, jsonObjString, collectionName);
             InsertResponse? responseObj = JsonConvert.DeserializeObject<InsertResponse>(response);
             return responseObj?.Code == 200;
         }
@@ -72,19 +74,25 @@ namespace MilvusDA.Extension
         {
             string collectionName = GetCollectionName(typeof(T));
             Type type = typeof(T);
-            
+
             SearchObjectApi searchApi = new SearchObjectApi()
             {
                 CollectionName = collectionName,
                 Data = data,
-                AnnsField = GetVectorFieldName(typeof(T))?? string.Empty,
-                OutputFields = type.GetProperties().Select(x=> x.Name).ToList()
+                AnnsField = GetVectorFieldName(typeof(T)) ?? string.Empty,
+                OutputFields = type.GetOutPutField(),
+                Limit = 1,
+                /*SearchParams = new SearchParameter()
+                {
+                    MertricType = MertricType.COSINE,
+                    Params = 
+                }*/
             };
             string jsonObjString = JsonConvert.SerializeObject(searchApi, Formatting.Indented, _jsonCamelCaseSetting);
-            string response = await milvusHelper.PostAsync("Search", jsonObjString, collectionName);
+            string response = await milvusHelper.PostAsync(EnumData.CommandType.Search, jsonObjString, collectionName);
             SearchResponse<T> responseObj = JsonConvert.DeserializeObject<SearchResponse<T>>(response);
             return responseObj?.Data ?? new List<T>();
-        } 
+        }
 
         private static string GetCollectionName(this Type type)
         {
@@ -129,17 +137,43 @@ namespace MilvusDA.Extension
         }
         private static string? GetVectorFieldName(this Type type)
         {
-            var properties = type.GetProperties();
-            foreach (var prop in properties)
+            var props = type.GetProperties();
+            foreach (var prop in props)
             {
-                var dbFieldAttribute = (DbFieldAttribute)prop.GetCustomAttribute(type);
-                if (dbFieldAttribute != null && dbFieldAttribute.IsVector)
+                DbFieldAttribute? attribute = (DbFieldAttribute)prop.GetCustomAttributes(typeof(DbFieldAttribute))?.FirstOrDefault();
+                if (attribute != null && attribute.IsVector)
                 {
-                    return prop.Name;
+                    return attribute.FieldName;
                 }
             }
             return null;
         }
 
+        private static List<string> GetOutPutField(this Type type)
+        {
+            List<string> result = new List<string>();
+            var props = type.GetProperties();
+            foreach (var prop in props)
+            {
+                DbFieldAttribute? attribute = (DbFieldAttribute)prop.GetCustomAttributes(typeof(DbFieldAttribute))?.FirstOrDefault();
+                if (attribute != null && !string.IsNullOrEmpty(attribute.FieldName))
+                {
+                    result.Add(attribute.FieldName);
+                }
+                else
+                {
+                    //camel case data
+                    result.Add(String.Format("{0}{1}", prop.Name.First().ToString().ToLowerInvariant(), prop.Name.Substring(1)));
+                }    
+            }
+            return result;
+        }
+        private static object GetPropertyValue(this object obj, string propertyName)
+        {
+            if (obj == null || string.IsNullOrEmpty(propertyName)) return null;
+            PropertyInfo propertyInfo = obj.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (propertyInfo == null || !propertyInfo.CanRead) return null;
+            return propertyInfo.GetValue(obj);
+        }
     }
 }
